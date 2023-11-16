@@ -21,30 +21,30 @@ import com.twendev.vulpes.lagopus.AppAddon
 
 @Composable
 fun <T> SearchableDropdown(
-    placeholderText : String,
-    viewModel: SearchableDropdownViewModel<T>
+    placeholder : String,
+    controller: SearchableDropdownController<T>
 ) {
-    val uiState by viewModel.uiState.collectAsState();
+    val uiState by controller.uiState.collectAsState();
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     SearchableDropdownContent(
-        placeholder = placeholderText,
+        placeholder = placeholder,
         isExpanded = uiState.isExpanded,
         value = uiState.selectedText,
         filteredItems = uiState.filteredList,
         onExpandedChange = {
-            viewModel.SwitchExpand()
+            controller.SwitchExpand()
         },
         onSelectionChanged = { selection : String ->
-            if (viewModel.ChangeSelection(selection)) {
-                AppAddon.ToastIsDebug("Группа: $selection", context)
+            if (controller.ChangeSelection(selection)) {
+                AppAddon.ToastIsDebug("Selected $selection", context)
                 focusManager.clearFocus()
             }
         },
         onValueChanged = {
-            viewModel.ChangeSearch(it)
+            controller.ChangeSearch(it)
         }
     )
 }

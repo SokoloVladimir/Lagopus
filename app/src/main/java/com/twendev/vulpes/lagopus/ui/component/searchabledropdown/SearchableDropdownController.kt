@@ -1,13 +1,12 @@
 package com.twendev.vulpes.lagopus.ui.component.searchabledropdown
 
-import androidx.lifecycle.ViewModel
 import com.twendev.vulpes.lagopus.model.Work
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class SearchableDropdownViewModel<T>(list: List<T>) : ViewModel() {
+class SearchableDropdownController<T>(list: List<T>) {
     private val _uiState : MutableStateFlow<SearchableDropdownUiState<T>>
     val uiState: StateFlow<SearchableDropdownUiState<T>>
 
@@ -28,7 +27,9 @@ class SearchableDropdownViewModel<T>(list: List<T>) : ViewModel() {
 
     fun ChangeSearch(value: String) {
         _uiState.update {
-            it.copy(selectedText = value)
+            it.copy(
+                selectedText = value
+            )
         }
 
         Refilter(value)
@@ -39,12 +40,15 @@ class SearchableDropdownViewModel<T>(list: List<T>) : ViewModel() {
      * @return Boolean если выбор успешен
      */
     fun ChangeSelection(value: String) : Boolean {
-        _uiState.value.dropdownList.forEach { listElement ->
-            if (listElement.toString().equals(value, ignoreCase = true)) {
+        _uiState.value.dropdownList.forEach { element ->
+            if (element.toString().equals(value, ignoreCase = true)) {
                 _uiState.update { state ->
-                    state.copy(selectedText = listElement.toString(), isExpanded = false)
-                    return true;
+                    state.copy(
+                        selectedText = element.toString(),
+                        isExpanded = false
+                    )
                 }
+                return true;
             }
         }
         return false;

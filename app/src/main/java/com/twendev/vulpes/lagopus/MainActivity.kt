@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
                     val displaySnackBar : (text: String) -> Unit = { text ->
                         scope.launch {
-                            snackbarHostState.showSnackbar(text)
+                            snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
                         }
                     }
 
@@ -49,11 +50,10 @@ class MainActivity : ComponentActivity() {
                             ExtendedFloatingActionButton(
                                 onClick = { displaySnackBar("${++clickCount}") },
                             ) { Text("Show snackbar") }
-                        },
-                        content = { innerPadding ->
-                            MainPage(innerPadding, displaySnackBar)
                         }
-                    )
+                    ) { innerPadding ->
+                        MainPage(innerPadding, displaySnackBar)
+                    }
                 }
             }
         }

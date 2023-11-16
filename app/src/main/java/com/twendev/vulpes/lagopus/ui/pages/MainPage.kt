@@ -4,13 +4,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
-import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownViewModel
+import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
 
 @Composable
 fun MainPage(padding: PaddingValues, showSnackBar: (text: String) -> Unit)
@@ -28,23 +32,23 @@ fun MainPage(padding: PaddingValues, showSnackBar: (text: String) -> Unit)
         Work(1, WorkType.Static.PractTask),
     );
 
-    val groupViewModel = SearchableDropdownViewModel(groups.toList());
-    val disciplineViewModel = SearchableDropdownViewModel(disciplines.toList());
-    val workViewModel = SearchableDropdownViewModel(works.toList());
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    val controller = SearchableDropdownController(groups.toList());
 
     LazyColumn {
         item {
-            SearchableDropdown("Группа", groupViewModel);
+            SearchableDropdown(
+                placeholder = "Группа",
+                controller = controller
+            )
             Spacer(modifier = Modifier.height(20.dp))
-        }
-        item {
-            SearchableDropdown("Дисциплина", disciplineViewModel);
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-        item {
-            SearchableDropdown("Работа", workViewModel);
-            Spacer(modifier = Modifier.height(20.dp))
+            Button(onClick = {
+                showSnackBar(controller.uiState.value.selectedText)
+            }) {
+                Text(text = "snack")
+            }
         }
     }
-
 }
