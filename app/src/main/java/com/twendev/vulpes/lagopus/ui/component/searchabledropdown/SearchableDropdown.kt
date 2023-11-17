@@ -24,7 +24,7 @@ fun <T> SearchableDropdown(
     placeholder : String,
     controller: SearchableDropdownController<T>
 ) {
-    val uiState by controller.uiState.collectAsState();
+    val uiState by controller.uiState.collectAsState()
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -43,6 +43,9 @@ fun <T> SearchableDropdown(
                 focusManager.clearFocus()
             }
         },
+        onKeyboardAction = { selection: String ->
+            controller.KeyboardAction(selection)
+        },
         onValueChanged = {
             controller.ChangeSearch(it)
         }
@@ -58,6 +61,7 @@ fun <T> SearchableDropdownContent(
     filteredItems: List<T>,
     onExpandedChange : () -> Unit,
     onSelectionChanged : (selection: String) -> Unit,
+    onKeyboardAction : (selection: String) -> Unit,
     onValueChanged : (String) -> Unit
 ) {
     Box(
@@ -75,7 +79,7 @@ fun <T> SearchableDropdownContent(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = {
-                    onSelectionChanged(value)
+                    onKeyboardAction(value)
                 })
             )
 

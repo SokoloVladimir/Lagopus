@@ -6,13 +6,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class SearchableDropdownController<T>(list: List<T>) {
+class SearchableDropdownController<T>(
+    list: List<T>,
+    var onSelect : (T) -> Unit = {},
+    var onKeyboardAction : ((String) -> Unit)? = null
+) {
     private val _uiState : MutableStateFlow<SearchableDropdownUiState<T>>
     val uiState: StateFlow<SearchableDropdownUiState<T>>
 
     init {
         _uiState = MutableStateFlow(SearchableDropdownUiState(dropdownList = list))
-        uiState = _uiState.asStateFlow();
+        uiState = _uiState.asStateFlow()
     }
 
     fun SwitchExpand(state: Boolean? = null) {
@@ -21,7 +25,7 @@ class SearchableDropdownController<T>(list: List<T>) {
         }
 
         if (_uiState.value.isExpanded) {
-            Refilter();
+            Refilter()
         }
     }
 
@@ -48,10 +52,20 @@ class SearchableDropdownController<T>(list: List<T>) {
                         isExpanded = false
                     )
                 }
-                return true;
+                onSelect(element)
+                return true
             }
         }
-        return false;
+        return false
+    }
+
+    fun KeyboardAction(value : String) {
+        if (onKeyboardAction == null) {
+            ChangeSelection(value)
+        } else {
+            onKeyboardAction?.let { it(value) }
+        }
+
     }
 
     private fun Refilter(value: String? = null) {
@@ -72,6 +86,6 @@ class SearchableDropdownController<T>(list: List<T>) {
         filtered += listToFilter.filter {
             it.toString().contains(filterText, ignoreCase = true)
         }
-        return filtered.toList();
+        return filtered.toList()
     }
 }
