@@ -5,17 +5,17 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://200.0.0.54:5205/"
+    private const val BASE_URL = "https://zerda.twenkey.ru"
 
     private val okHttpClient = OkHttpClient()
         .newBuilder()
         .addInterceptor(RequestInterceptor)
         .build()
 
-    fun getClient(): Retrofit =
+    fun getClient(baseUrl: String? = null): Retrofit =
         Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl ?: BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 }
