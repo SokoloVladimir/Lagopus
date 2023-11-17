@@ -1,11 +1,10 @@
-package com.twendev.vulpes.lagopus.ui.pages
+package com.twendev.vulpes.lagopus.ui.screen
 
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,9 +20,11 @@ import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDrop
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
 
 @Composable
-fun MainPage(padding: PaddingValues, showSnackBar: (text: String) -> Unit)
+fun MainScreen(padding: PaddingValues, instanceUrl: String? = null)
 {
-    val zerda = ZerdaService()
+    Log.d("MainScreen", "started with $instanceUrl")
+
+    val zerda = ZerdaService(if (instanceUrl.isNullOrBlank()) null else instanceUrl)
     var works by remember { mutableStateOf<List<Work>>(listOf()) }
 
     LaunchedEffect(works) {
@@ -31,9 +32,8 @@ fun MainPage(padding: PaddingValues, showSnackBar: (text: String) -> Unit)
         Log.d("MainPage",works.firstOrNull()?.theme ?: "")
     }
 
-
     if (works.isNotEmpty()) {
-        val controller = SearchableDropdownController(works)
+        val controller = SearchableDropdownController(works) { }
 
         LazyColumn {
             item {
@@ -42,11 +42,6 @@ fun MainPage(padding: PaddingValues, showSnackBar: (text: String) -> Unit)
                     controller = controller
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                Button(onClick = {
-                    showSnackBar(controller.uiState.value.selectedText)
-                }) {
-                    Text(text = "snack")
-                }
             }
         }
     } else {
