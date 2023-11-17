@@ -31,9 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.twendev.vulpes.lagopus.ui.screen.AuthScreen
-import com.twendev.vulpes.lagopus.ui.screen.MainScreen
-import com.twendev.vulpes.lagopus.ui.screen.Screen
+import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,7 +54,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     val navController = rememberNavController()
-                    val screens = listOf(Screen.MainScreen, Screen.AuthScreen)
+                    val screens = listOf(Screen.MainScreen, Screen.DisciplineViewScreen)
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
                     ModalNavigationDrawer(
@@ -95,7 +93,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
+                            NavHost(navController = navController, startDestination = Screen.DisciplineViewScreen.route) {
                                 composable(
                                     route = Screen.AuthScreen.route
                                 ) {
@@ -106,7 +104,7 @@ class MainActivity : ComponentActivity() {
                                             }
 
                                             Log.d("MA", Screen.MainScreen.createRoute(url))
-                                            ZerdaService(url)
+                                            ZerdaService.Singleton = ZerdaService(url)
                                             navController.navigate(Screen.MainScreen.createRoute(url))
                                             true
                                         } catch (ex : Exception) {
@@ -120,6 +118,11 @@ class MainActivity : ComponentActivity() {
                                     arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
                                 ) {
                                     MainScreen(padding = innerPadding, instanceUrl = it.arguments?.getString("url"))
+                                }
+                                composable(
+                                    route = Screen.DisciplineViewScreen.route
+                                ) {
+                                    DisciplineViewScreen(padding = innerPadding)
                                 }
                             }
                         }

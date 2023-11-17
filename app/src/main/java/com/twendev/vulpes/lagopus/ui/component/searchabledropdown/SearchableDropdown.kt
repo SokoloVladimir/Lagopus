@@ -13,10 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import com.twendev.vulpes.lagopus.AppAddon
 
 
 @Composable
@@ -25,9 +22,6 @@ fun <T> SearchableDropdown(
     controller: SearchableDropdownController<T>
 ) {
     val uiState by controller.uiState.collectAsState()
-
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
 
     SearchableDropdownContent(
         placeholder = placeholder,
@@ -38,10 +32,7 @@ fun <T> SearchableDropdown(
             controller.SwitchExpand()
         },
         onSelectionChanged = { selection : String ->
-            if (controller.ChangeSelection(selection)) {
-                AppAddon.ToastIsDebug("Selected $selection", context)
-                focusManager.clearFocus()
-            }
+            controller.ChangeSelection(selection)
         },
         onKeyboardAction = { selection: String ->
             controller.KeyboardAction(selection)
