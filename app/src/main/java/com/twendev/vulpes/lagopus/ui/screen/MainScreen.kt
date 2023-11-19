@@ -1,6 +1,5 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,32 +17,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.ZerdaService
-import com.twendev.vulpes.lagopus.model.User
+import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
 
 @Composable
-fun MainScreen(padding: PaddingValues, instanceUrl: String? = null)
+fun MainScreen(padding: PaddingValues)
 {
-    Log.d("MainScreen", "started with $instanceUrl")
-
     var loadingStatus by remember { mutableStateOf(false) }
-    val zerda = ZerdaService(if (instanceUrl.isNullOrBlank()) null else instanceUrl)
+    val zerda = ZerdaService.Singleton!!
     var works by remember { mutableStateOf<List<Work>>(listOf()) }
-    var users by remember { mutableStateOf<List<User>>(listOf()) }
+    var students by remember { mutableStateOf<List<Student>>(listOf()) }
 
     LaunchedEffect(loadingStatus) {
         works = zerda.api.getWorks().toList()
-        users = zerda.api.getUsers().toList()
+        students = zerda.api.getStudents().toList()
 
         loadingStatus = true
     }
 
     if (loadingStatus) {
         val workController = SearchableDropdownController(works) { }
-        val userController = SearchableDropdownController(users) { }
+        val studentController = SearchableDropdownController(students) { }
 
         LazyColumn {
             item {
@@ -57,7 +54,7 @@ fun MainScreen(padding: PaddingValues, instanceUrl: String? = null)
             item {
                 SearchableDropdown(
                     placeholder = "User",
-                    controller = userController
+                    controller = studentController
                 )
                 Spacer(modifier = Modifier.height(20.dp))
             }

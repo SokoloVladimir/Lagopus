@@ -26,7 +26,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,8 +49,6 @@ fun AuthScreen(
     )}
     val tryToConnect : () -> Unit = {
         scope.launch {
-            loadingStatus = true
-            delay(500)
             loadingStatus = navigateToMainScreen(instanceController.uiState.value.selectedText)
             if (!loadingStatus) {
                 showMessage("Failed to fetch API")

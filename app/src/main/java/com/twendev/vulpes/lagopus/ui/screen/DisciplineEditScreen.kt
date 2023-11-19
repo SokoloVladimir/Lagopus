@@ -27,9 +27,9 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,35 +39,28 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.twendev.vulpes.lagopus.ZerdaService
 import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
+import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditUiState
+import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditViewModel
 
 @Composable
-fun DisciplineViewScreen(padding: PaddingValues) {
+fun DisciplineEditScreen(padding: PaddingValues) {
     Log.d("DisciplineViewScreen",  "Opened")
 
-    val zerda = ZerdaService.Singleton!!
-    var isLoaded by remember { mutableStateOf(false) }
-    val disciplines : MutableList<Discipline> = remember { mutableListOf() }
+    val viewModel by remember { mutableStateOf(DisciplineEditViewModel()) }
+    val uiState = viewModel.uiState.collectAsState()
 
-    LaunchedEffect(isLoaded) {
-        disciplines.addAll(zerda.api.getDisciplines().toList())
-        isLoaded = true
-    }
+    DisciplineEditScreenContent(
+        uiState
+    )
+}
 
-    if (isLoaded) {
-        LazyColumn {
-            items(disciplines.toList()) { discipline ->
-                DisciplineCard(
-                    discipline = discipline,
-                    onSave = {
-                        zerda.api.putDiscipline(it)
-                    }
-                )
-            }
-        }
-    } else {
+@Composable
+fun DisciplineEditScreenContent(
+    uiState : State<DisciplineEditUiState>
+) {
+    if (uiState.value.loading) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -75,25 +68,38 @@ fun DisciplineViewScreen(padding: PaddingValues) {
         ) {
             CircleLoading()
         }
+    } else {
+        LazyColumn {
+            items(uiState.value.disciplines ?: listOf()) { discipline ->
+                DisciplineCard(
+                    discipline = discipline,
+                    onNameChange = {
+                        discipline.name = it
+                    },
+                    onSave = {
+
+                    }
+                )
+            }
+        }
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun DisciplineCard(discipline: Discipline, onSave: suspend (Discipline) -> Unit) {
+fun DisciplineCard(
+    discipline: Discipline,
+    onNameChange : (String) -> Unit,
+    onSave: suspend (Discipline) -> Unit
+) {
     var isEditMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
-    var dId by remember { mutableIntStateOf(discipline.id) }
-    var dName by remember { mutableStateOf(discipline.name) }
-
-    LaunchedEffect(isEditMode) {
-        if (!isEditMode) {
-            onSave(Discipline(id = dId, name = dName))
-        }
-    }
+//    LaunchedEffect(isEditMode) {
+//        if (!isEditMode) {
+//            onSave(Discipline(id = discipline.id, name = discipline.name))
+//        }
+//    }
 
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -117,7 +123,7 @@ fun DisciplineCard(discipline: Discipline, onSave: suspend (Discipline) -> Unit)
             exit = fadeOut() + shrinkVertically()
         ) {
             Text(
-                text = dName,
+                text = discipline.name,
                 modifier = Modifier.padding(15.dp)
             )
         }
@@ -132,10 +138,10 @@ fun DisciplineCard(discipline: Discipline, onSave: suspend (Discipline) -> Unit)
             Column(
                 modifier = Modifier.padding(15.dp)
             ) {
-                Text("Редактирование записи #${dId}")
+                Text("Редактирование записи #${discipline.id}")
                 OutlinedTextField(
-                    value = dName,
-                    onValueChange = { dName = it },
+                    value = discipline.name,
+                    onValueChange = onNameChange,
                     label = { Text("Наименование дисциплины") },
                     singleLine = true,
                     keyboardActions = KeyboardActions(onDone = {

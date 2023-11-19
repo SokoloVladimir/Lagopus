@@ -1,11 +1,15 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
-import androidx.annotation.StringRes
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Screen(val route: String, @StringRes val resourceId: Int) {
-    object MainScreen : Screen("main", androidx.compose.ui.R.string.tab)
-    object AuthScreen : Screen("auth", androidx.compose.material3.R.string.dialog)
-    object DisciplineViewScreen : Screen("disciplineview", android.R.string.copy)
+sealed class Screen(val route: String, val icon: ImageVector) {
+    object MainScreen : Screen("main", Icons.Filled.Home)
+    object AuthScreen : Screen("auth", Icons.Filled.Lock)
+    object DisciplineViewScreen : Screen("disciplineview", Icons.Filled.Edit)
 
     fun createRoute(url : String?) : String {
         return "$route?instance=$url"

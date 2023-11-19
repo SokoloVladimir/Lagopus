@@ -5,8 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -72,11 +69,11 @@ class MainActivity : ComponentActivity() {
                                             NavigationBarItem(
                                                 icon = {
                                                     Icon(
-                                                        Icons.Filled.Favorite,
+                                                        screen.icon,
                                                         contentDescription = null
                                                     )
                                                 },
-                                                label = { Text(stringResource(screen.resourceId)) },
+                                                label = { Text(screen.route) },
                                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                                 onClick = {
                                                     navController.navigate(screen.route) {
@@ -93,7 +90,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(navController = navController, startDestination = Screen.DisciplineViewScreen.route) {
+                            NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
                                 composable(
                                     route = Screen.AuthScreen.route
                                 ) {
@@ -114,15 +111,20 @@ class MainActivity : ComponentActivity() {
                                     })
                                 }
                                 composable(
+                                    route = Screen.MainScreen.route
+                                ) {
+                                    MainScreen(padding = innerPadding)
+                                }
+                                composable(
                                     route = Screen.MainScreen.createRoute("{url}"),
                                     arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
                                 ) {
-                                    MainScreen(padding = innerPadding, instanceUrl = it.arguments?.getString("url"))
+                                    MainScreen(padding = innerPadding)
                                 }
                                 composable(
                                     route = Screen.DisciplineViewScreen.route
                                 ) {
-                                    DisciplineViewScreen(padding = innerPadding)
+                                    DisciplineEditScreen(padding = innerPadding)
                                 }
                             }
                         }
