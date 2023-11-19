@@ -9,8 +9,6 @@ data class Work (
     @SerializedName("workTypeId"   ) var workTypeId   : Int,
     @SerializedName("number"       ) var number       : Int,
     @SerializedName("theme"        ) var theme        : String?     = null,
-    @SerializedName("dateEst"      ) var dateEst      : String?     = null,
-    @SerializedName("taskCount"    ) var taskCount    : Int,
     @SerializedName("discipline"   ) var discipline   : Discipline,
     @SerializedName("workType"     ) var workType     : WorkType
 ) {
