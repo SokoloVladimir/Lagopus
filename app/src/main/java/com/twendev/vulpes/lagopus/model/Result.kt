@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Result (
     @SerializedName("studentId"     ) var studentId     : Int,
-    @SerializedName("workVariantId" ) var workVariantId : Int,
-    @SerializedName("tasks"         ) var tasks         : ArrayList<Int> = arrayListOf(),
+    @SerializedName("workId"        ) var workId        : Int,
+    @SerializedName("tasks"         ) var tasks         : ULong,
     @SerializedName("taskCount"     ) var taskCount     : Int
 )

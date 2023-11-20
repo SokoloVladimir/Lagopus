@@ -9,8 +9,6 @@ import retrofit2.http.PUT
 interface ZerdaApi {
     @GET("/Work")
     suspend fun getWorks() : Array<Work>
-    @GET("/WorkVariant")
-    suspend fun getWorkVariant() : Array<WorkVariant>
     @GET("/WorkType")
     suspend fun getWorkTypes() : Array<WorkType>
     @GET("/Discipline")

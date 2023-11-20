@@ -9,18 +9,10 @@ data class Student (
     @SerializedName("patronym"  ) var patronym  : String?  = null,
     @SerializedName("accountId" ) var accountId : Int?     = null,
     @SerializedName("groupId"   ) var groupId   : Int,
-    @SerializedName("isDeleted" ) private var isDeleted : Int,
+    @SerializedName("isDeleted" ) var isDeleted : Boolean,
     @SerializedName("account"   ) var account   : Account? = null,
     @SerializedName("group"     ) var group     : Group
 ) {
-    fun getIsDeleted() : Boolean {
-        return isDeleted != 0
-    }
-
-    fun setIsDeleted(value: Boolean) {
-        isDeleted = if (value) 1 else 0
-    }
-
     override fun toString(): String {
         return "${name.first()}. $surname"
     }
