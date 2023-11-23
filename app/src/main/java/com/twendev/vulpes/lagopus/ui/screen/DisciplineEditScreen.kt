@@ -13,16 +13,25 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarDuration
@@ -43,11 +52,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.twendev.vulpes.lagopus.ZerdaService
 import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,11 +65,13 @@ fun DisciplineEditScreen(padding: PaddingValues, snackBarHostState: SnackbarHost
 
     val viewModel by remember { mutableStateOf(DisciplineEditViewModel()) }
     val uiState = viewModel.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
 
     DisciplineEditScreenContent(
         uiState = uiState,
         viewModel = viewModel,
-        snackBarHostState = snackBarHostState
+        snackBarHostState = snackBarHostState,
+        coroutineScope = scope
     )
 }
 
@@ -70,18 +81,23 @@ fun DisciplineEditScreen(padding: PaddingValues, snackBarHostState: SnackbarHost
 fun DisciplineEditScreenContent(
     uiState : State<DisciplineEditUiState>,
     viewModel: DisciplineEditViewModel,
-    snackBarHostState : SnackbarHostState
+    snackBarHostState : SnackbarHostState,
+    coroutineScope : CoroutineScope
 ) {
-    if (uiState.value.loading) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircleLoading()
+    Box {
+        if (uiState.value.loading) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircleLoading()
+            }
         }
-    } else {
-        LazyColumn {
+
+        LazyColumn(
+            contentPadding = PaddingValues(15.dp)
+        ) {
             items(viewModel.disciplines) { discipline ->
                 DisciplineCard(
                     discipline = discipline,
@@ -89,28 +105,45 @@ fun DisciplineEditScreenContent(
                         val index = viewModel.disciplines.indexOf(discipline)
                         viewModel.disciplines[index] = viewModel.disciplines[index].copy(name = it)
                     },
-                    onSave = { before, after ->
-                        Log.d("DisciplineEditScreen", "onSave $after")
-
-                        var snackBarResult = snackBarHostState.showSnackbar(
-                            message = "Запись ${after.id} сохранена",
-                            actionLabel = "Undo",
-                            duration = SnackbarDuration.Short
-                        )
-
-                        when (snackBarResult) {
-                            SnackbarResult.ActionPerformed -> {
-                                Log.d("DisciplineEditScreen", "snackBar ActionPerformed")
-                                val index = viewModel.disciplines.indexOf(after)
-                                viewModel.disciplines[index] = viewModel.disciplines[index].copy(name = before.name)
-                            }
-                            SnackbarResult.Dismissed -> {
-                                Log.d("DisciplineEditScreen", "snackBar Dismissed")
-                                ZerdaService.Singleton!!.api.putDiscipline(after)
+                    onSave = {
+                        viewModel.updateDiscipline(it)
+                    },
+                    onDelete = {
+                        viewModel.prepareDeleteDiscipline(it)
+                        coroutineScope.launch {
+                            val snackBarResult = snackBarHostState.showSnackbar(
+                                message = "Запись ${it.id} удалена",
+                                actionLabel = "Undo",
+                                duration = SnackbarDuration.Short
+                            )
+                            when (snackBarResult) {
+                                SnackbarResult.ActionPerformed -> {
+                                    Log.d("DisciplineEditScreen", "snackBar ActionPerformed")
+                                    viewModel.cancelDeleteDiscipline(it)
+                                }
+                                SnackbarResult.Dismissed -> {
+                                    Log.d("DisciplineEditScreen", "snackBar Dismissed")
+                                    viewModel.confirmDeleteDiscipline(it)
+                                }
                             }
                         }
                     }
                 )
+                Spacer(Modifier.height(15.dp))
+            }
+
+            item {
+                IconButton(
+                    onClick = {
+                        viewModel.createDiscipline(Discipline())
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row {
+                        Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
+                        Text(text = "Новая запись")
+                    }
+                }
             }
         }
     }
@@ -119,14 +152,14 @@ fun DisciplineEditScreenContent(
 
 @Composable
 fun DisciplineCard(
-    discipline: Discipline,
+    discipline : Discipline,
     onNameChange : (String) -> Unit,
-    onSave: suspend (Discipline, Discipline) -> Unit
+    onSave: suspend (Discipline) -> Unit,
+    onDelete: suspend (Discipline) -> Unit
 ) {
     var editMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
-    var disciplineBeforeEdit by remember { mutableStateOf(discipline) }
 
     DisciplineCardContent(
         discipline = discipline,
@@ -134,17 +167,20 @@ fun DisciplineCard(
         isEditMode = editMode,
         onEditModeSwitch = {
             editMode = !editMode
-            if (editMode) {
-                disciplineBeforeEdit = discipline
-            } else {
+            if (!editMode) {
                 // выход из режима редактирования
                 scope.launch {
-                    onSave(disciplineBeforeEdit, discipline)
+                    onSave(discipline)
                 }
             }
-
         },
-        onNameChange = onNameChange
+        onNameChange = onNameChange,
+        onDeleteClick = {
+            editMode = false
+            scope.launch {
+                onDelete(discipline)
+            }
+        }
     )
 }
 
@@ -155,14 +191,14 @@ fun DisciplineCardContent(
     focusRequester: FocusRequester,
     isEditMode : Boolean,
     onEditModeSwitch : () -> Unit,
-    onNameChange: (String) -> Unit
+    onNameChange: (String) -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp)
             .animateContentSize(
                 animationSpec = tween(
                     durationMillis = 300,
@@ -203,6 +239,9 @@ fun DisciplineCardContent(
                     keyboardActions = KeyboardActions(onDone = { onEditModeSwitch() }),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
+                IconButton(onClick = onDeleteClick) {
+                    Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
+                }
             }
         }
     }

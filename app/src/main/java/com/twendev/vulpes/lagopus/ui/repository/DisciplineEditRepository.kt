@@ -3,17 +3,21 @@ package com.twendev.vulpes.lagopus.ui.repository
 import com.twendev.vulpes.lagopus.ZerdaService
 import com.twendev.vulpes.lagopus.model.Discipline
 
-class DisciplineEditRepository {
-    private var cache : List<Discipline> = listOf()
-    private suspend fun update() {
-        cache = ZerdaService.Singleton!!.api.getDisciplines().toList()
+class DisciplineEditRepository : RepositoryInterface<Discipline> {
+    private val zerdaSource = ZerdaService.Singleton!!
+
+    override suspend fun pullAndGet(): List<Discipline> {
+        return zerdaSource.api.getDisciplines().toList()
     }
-    fun get(): List<Discipline> {
-        return cache
+    override suspend fun updateAndPush(obj: Discipline) {
+        return zerdaSource.api.putDiscipline(obj)
     }
 
-    suspend fun updateAndGet(): List<Discipline> {
-        update()
-        return get()
+    override suspend fun createAndPush(obj: Discipline) : Discipline {
+        return zerdaSource.api.postDiscipline(obj)
+    }
+
+    override suspend fun deleteAndPush(obj: Discipline) {
+        zerdaSource.api.deleteDiscipline(obj.id)
     }
 }
