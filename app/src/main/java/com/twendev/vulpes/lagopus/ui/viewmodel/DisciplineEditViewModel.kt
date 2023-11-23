@@ -1,5 +1,6 @@
 package com.twendev.vulpes.lagopus.ui.viewmodel
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.twendev.vulpes.lagopus.model.Discipline
@@ -11,24 +12,23 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class DisciplineEditUiState(
-    val loading : Boolean = true,
-    val disciplines: List<Discipline>? = null
+    val loading : Boolean = true
 )
 
 class DisciplineEditViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DisciplineEditUiState())
     val uiState: StateFlow<DisciplineEditUiState> = _uiState.asStateFlow()
-    private val repo = DisciplineEditRepository()
+    private val repository = DisciplineEditRepository()
+
+    val disciplines = mutableStateListOf<Discipline>()
+
+
 
     init {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    loading = false,
-                    disciplines = repo.load()
-                )
-            }
+            disciplines.clear()
+            disciplines.addAll(repository.updateAndGet().toMutableList())
+            _uiState.update { it.copy( loading = false) }
         }
-
     }
 }

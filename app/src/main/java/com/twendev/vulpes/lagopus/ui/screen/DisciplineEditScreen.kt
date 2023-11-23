@@ -25,6 +25,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -32,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,26 +43,34 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.twendev.vulpes.lagopus.ZerdaService
 import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun DisciplineEditScreen(padding: PaddingValues) {
+fun DisciplineEditScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
     Log.d("DisciplineViewScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(DisciplineEditViewModel()) }
     val uiState = viewModel.uiState.collectAsState()
 
     DisciplineEditScreenContent(
-        uiState
+        uiState = uiState,
+        viewModel = viewModel,
+        snackBarHostState = snackBarHostState
     )
 }
 
+
+
 @Composable
 fun DisciplineEditScreenContent(
-    uiState : State<DisciplineEditUiState>
+    uiState : State<DisciplineEditUiState>,
+    viewModel: DisciplineEditViewModel,
+    snackBarHostState : SnackbarHostState
 ) {
     if (uiState.value.loading) {
         Column(
@@ -70,14 +82,33 @@ fun DisciplineEditScreenContent(
         }
     } else {
         LazyColumn {
-            items(uiState.value.disciplines ?: listOf()) { discipline ->
+            items(viewModel.disciplines) { discipline ->
                 DisciplineCard(
                     discipline = discipline,
                     onNameChange = {
-                        discipline.name = it
+                        val index = viewModel.disciplines.indexOf(discipline)
+                        viewModel.disciplines[index] = viewModel.disciplines[index].copy(name = it)
                     },
-                    onSave = {
+                    onSave = { before, after ->
+                        Log.d("DisciplineEditScreen", "onSave $after")
 
+                        var snackBarResult = snackBarHostState.showSnackbar(
+                            message = "Запись ${after.id} сохранена",
+                            actionLabel = "Undo",
+                            duration = SnackbarDuration.Short
+                        )
+
+                        when (snackBarResult) {
+                            SnackbarResult.ActionPerformed -> {
+                                Log.d("DisciplineEditScreen", "snackBar ActionPerformed")
+                                val index = viewModel.disciplines.indexOf(after)
+                                viewModel.disciplines[index] = viewModel.disciplines[index].copy(name = before.name)
+                            }
+                            SnackbarResult.Dismissed -> {
+                                Log.d("DisciplineEditScreen", "snackBar Dismissed")
+                                ZerdaService.Singleton!!.api.putDiscipline(after)
+                            }
+                        }
                     }
                 )
             }
@@ -85,22 +116,47 @@ fun DisciplineEditScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+
 @Composable
 fun DisciplineCard(
     discipline: Discipline,
     onNameChange : (String) -> Unit,
-    onSave: suspend (Discipline) -> Unit
+    onSave: suspend (Discipline, Discipline) -> Unit
 ) {
-    var isEditMode by remember { mutableStateOf(false) }
+    var editMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    val scope = rememberCoroutineScope()
+    var disciplineBeforeEdit by remember { mutableStateOf(discipline) }
 
-//    LaunchedEffect(isEditMode) {
-//        if (!isEditMode) {
-//            onSave(Discipline(id = discipline.id, name = discipline.name))
-//        }
-//    }
+    DisciplineCardContent(
+        discipline = discipline,
+        focusRequester = focusRequester,
+        isEditMode = editMode,
+        onEditModeSwitch = {
+            editMode = !editMode
+            if (editMode) {
+                disciplineBeforeEdit = discipline
+            } else {
+                // выход из режима редактирования
+                scope.launch {
+                    onSave(disciplineBeforeEdit, discipline)
+                }
+            }
 
+        },
+        onNameChange = onNameChange
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@Composable
+fun DisciplineCardContent(
+    discipline: Discipline,
+    focusRequester: FocusRequester,
+    isEditMode : Boolean,
+    onEditModeSwitch : () -> Unit,
+    onNameChange: (String) -> Unit
+) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, Color.Black),
@@ -114,7 +170,7 @@ fun DisciplineCard(
                 )
             )
             .clickable {
-                isEditMode = !isEditMode
+                onEditModeSwitch()
             }
     ) {
         AnimatedVisibility(
@@ -144,9 +200,7 @@ fun DisciplineCard(
                     onValueChange = onNameChange,
                     label = { Text("Наименование дисциплины") },
                     singleLine = true,
-                    keyboardActions = KeyboardActions(onDone = {
-                        isEditMode = false
-                    }),
+                    keyboardActions = KeyboardActions(onDone = { onEditModeSwitch() }),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
             }

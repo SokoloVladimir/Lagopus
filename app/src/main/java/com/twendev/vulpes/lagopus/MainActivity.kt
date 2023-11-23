@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
+                            NavHost(navController = navController, startDestination = Screen.DisciplineViewScreen.route) {
                                 composable(
                                     route = Screen.AuthScreen.route
                                 ) {
@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
                                 composable(
                                     route = Screen.DisciplineViewScreen.route
                                 ) {
-                                    DisciplineEditScreen(padding = innerPadding)
+                                    DisciplineEditScreen(padding = innerPadding, snackbarHostState)
                                 }
                             }
                         }

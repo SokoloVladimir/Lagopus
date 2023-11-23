@@ -4,7 +4,16 @@ import com.twendev.vulpes.lagopus.ZerdaService
 import com.twendev.vulpes.lagopus.model.Discipline
 
 class DisciplineEditRepository {
-    suspend fun load(): List<Discipline> {
-        return ZerdaService.Singleton!!.api.getDisciplines().toList()
+    private var cache : List<Discipline> = listOf()
+    private suspend fun update() {
+        cache = ZerdaService.Singleton!!.api.getDisciplines().toList()
+    }
+    fun get(): List<Discipline> {
+        return cache
+    }
+
+    suspend fun updateAndGet(): List<Discipline> {
+        update()
+        return get()
     }
 }

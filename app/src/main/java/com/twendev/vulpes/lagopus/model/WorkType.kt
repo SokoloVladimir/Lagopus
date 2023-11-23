@@ -3,8 +3,8 @@ package com.twendev.vulpes.lagopus.model
 import com.google.gson.annotations.SerializedName
 
 data class WorkType (
-    @SerializedName("id"   ) var id   : Int,
-    @SerializedName("name" ) var name : String
+    @SerializedName("id"   ) val id   : Int,
+    @SerializedName("name" ) val name : String
 ) {
     fun getShortName() : String {
         var result = ""
