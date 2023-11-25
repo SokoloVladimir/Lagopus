@@ -1,4 +1,4 @@
-package com.twendev.vulpes.lagopus
+package com.twendev.vulpes.lagopus.datasource
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
