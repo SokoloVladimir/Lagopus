@@ -28,7 +28,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.screen.*
+import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -51,7 +55,12 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     val navController = rememberNavController()
-                    val screens = listOf(Screen.MainScreen, Screen.DisciplineViewScreen)
+                    val screens = listOf(
+                        Screen.MainScreen,
+                        Screen.DisciplineBrowseScreen,
+                        Screen.WorkTypeBrowseScreen,
+                        Screen.WorkBrowseScreen
+                    )
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
                     ModalNavigationDrawer(
@@ -90,7 +99,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(navController = navController, startDestination = Screen.DisciplineViewScreen.route) {
+                            NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
                                 composable(
                                     route = Screen.AuthScreen.route
                                 ) {
@@ -122,9 +131,19 @@ class MainActivity : ComponentActivity() {
                                     MainScreen(padding = innerPadding)
                                 }
                                 composable(
-                                    route = Screen.DisciplineViewScreen.route
+                                    route = Screen.DisciplineBrowseScreen.route
                                 ) {
-                                    DisciplineEditScreen(padding = innerPadding, snackbarHostState)
+                                    DisciplineBrowseScreen(padding = innerPadding, snackbarHostState)
+                                }
+                                composable(
+                                    route = Screen.WorkTypeBrowseScreen.route
+                                ) {
+                                    WorkTypeBrowseScreen(padding = innerPadding, snackbarHostState)
+                                }
+                                composable(
+                                    route = Screen.WorkBrowseScreen.route
+                                ) {
+                                    WorkBrowseScreen(padding = innerPadding, snackbarHostState)
                                 }
                             }
                         }

@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.twendev.vulpes.lagopus.ZerdaService
+import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
@@ -27,7 +27,7 @@ import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDrop
 fun MainScreen(padding: PaddingValues)
 {
     var loadingStatus by remember { mutableStateOf(false) }
-    val zerda = ZerdaService.Singleton!!
+    val zerda = ZerdaService.Singleton
     var works by remember { mutableStateOf<List<Work>>(listOf()) }
     var students by remember { mutableStateOf<List<Student>>(listOf()) }
 

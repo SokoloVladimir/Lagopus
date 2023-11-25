@@ -1,4 +1,4 @@
-package com.twendev.vulpes.lagopus.ui.screen
+package com.twendev.vulpes.lagopus.ui.screen.browse
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
@@ -52,22 +52,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.twendev.vulpes.lagopus.model.Discipline
+import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
-import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditUiState
-import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineEditViewModel
+import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
+import com.twendev.vulpes.lagopus.ui.viewmodel.WorkTypeBrowseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun DisciplineEditScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
-    Log.d("DisciplineViewScreen",  "Opened")
+fun WorkTypeBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
+    Log.d("WorkTypeBrowseScreen",  "Opened")
 
-    val viewModel by remember { mutableStateOf(DisciplineEditViewModel()) }
+    val viewModel by remember { mutableStateOf(WorkTypeBrowseViewModel()) }
     val uiState = viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
 
-    DisciplineEditScreenContent(
+    WorkTypeBrowseScreenContent(
         uiState = uiState,
         viewModel = viewModel,
         snackBarHostState = snackBarHostState,
@@ -75,17 +75,15 @@ fun DisciplineEditScreen(padding: PaddingValues, snackBarHostState: SnackbarHost
     )
 }
 
-
-
 @Composable
-fun DisciplineEditScreenContent(
-    uiState : State<DisciplineEditUiState>,
-    viewModel: DisciplineEditViewModel,
+fun WorkTypeBrowseScreenContent(
+    uiState : State<LoadingUiState>,
+    viewModel: WorkTypeBrowseViewModel,
     snackBarHostState : SnackbarHostState,
     coroutineScope : CoroutineScope
 ) {
     Box {
-        if (uiState.value.loading) {
+        if (uiState.value.isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -98,18 +96,18 @@ fun DisciplineEditScreenContent(
         LazyColumn(
             contentPadding = PaddingValues(15.dp)
         ) {
-            items(viewModel.disciplines) { discipline ->
-                DisciplineCard(
-                    discipline = discipline,
+            items(viewModel.items) { item ->
+                WorkTypeCard(
+                    item = item,
                     onNameChange = {
-                        val index = viewModel.disciplines.indexOf(discipline)
-                        viewModel.disciplines[index] = viewModel.disciplines[index].copy(name = it)
+                        val index = viewModel.items.indexOf(item)
+                        viewModel.items[index] = viewModel.items[index].copy(name = it)
                     },
                     onSave = {
-                        viewModel.updateDiscipline(it)
+                        viewModel.updateItem(it)
                     },
                     onDelete = {
-                        viewModel.prepareDeleteDiscipline(it)
+                        viewModel.prepareDeleteItem(it)
                         coroutineScope.launch {
                             val snackBarResult = snackBarHostState.showSnackbar(
                                 message = "Запись ${it.id} удалена",
@@ -119,11 +117,11 @@ fun DisciplineEditScreenContent(
                             when (snackBarResult) {
                                 SnackbarResult.ActionPerformed -> {
                                     Log.d("DisciplineEditScreen", "snackBar ActionPerformed")
-                                    viewModel.cancelDeleteDiscipline(it)
+                                    viewModel.cancelDeleteItem(it)
                                 }
                                 SnackbarResult.Dismissed -> {
                                     Log.d("DisciplineEditScreen", "snackBar Dismissed")
-                                    viewModel.confirmDeleteDiscipline(it)
+                                    viewModel.confirmDeleteItem(it)
                                 }
                             }
                         }
@@ -135,7 +133,7 @@ fun DisciplineEditScreenContent(
             item {
                 IconButton(
                     onClick = {
-                        viewModel.createDiscipline(Discipline())
+                        viewModel.createItem(WorkType())
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -149,20 +147,19 @@ fun DisciplineEditScreenContent(
     }
 }
 
-
 @Composable
-fun DisciplineCard(
-    discipline : Discipline,
+fun WorkTypeCard(
+    item : WorkType,
     onNameChange : (String) -> Unit,
-    onSave: suspend (Discipline) -> Unit,
-    onDelete: suspend (Discipline) -> Unit
+    onSave: suspend (WorkType) -> Unit,
+    onDelete: suspend (WorkType) -> Unit
 ) {
     var editMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
 
-    DisciplineCardContent(
-        discipline = discipline,
+    WorkTypeCardContent(
+        item = item,
         focusRequester = focusRequester,
         isEditMode = editMode,
         onEditModeSwitch = {
@@ -170,7 +167,7 @@ fun DisciplineCard(
             if (!editMode) {
                 // выход из режима редактирования
                 scope.launch {
-                    onSave(discipline)
+                    onSave(item)
                 }
             }
         },
@@ -178,7 +175,7 @@ fun DisciplineCard(
         onDeleteClick = {
             editMode = false
             scope.launch {
-                onDelete(discipline)
+                onDelete(item)
             }
         }
     )
@@ -186,8 +183,8 @@ fun DisciplineCard(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun DisciplineCardContent(
-    discipline: Discipline,
+fun WorkTypeCardContent(
+    item: WorkType,
     focusRequester: FocusRequester,
     isEditMode : Boolean,
     onEditModeSwitch : () -> Unit,
@@ -215,7 +212,7 @@ fun DisciplineCardContent(
             exit = fadeOut() + shrinkVertically()
         ) {
             Text(
-                text = discipline.name,
+                text = item.name,
                 modifier = Modifier.padding(15.dp)
             )
         }
@@ -230,11 +227,11 @@ fun DisciplineCardContent(
             Column(
                 modifier = Modifier.padding(15.dp)
             ) {
-                Text("Редактирование записи #${discipline.id}")
+                Text("Редактирование записи #${item.id}")
                 OutlinedTextField(
-                    value = discipline.name,
+                    value = item.name,
                     onValueChange = onNameChange,
-                    label = { Text("Наименование дисциплины") },
+                    label = { Text("Наименование типа") },
                     singleLine = true,
                     keyboardActions = KeyboardActions(onDone = { onEditModeSwitch() }),
                     modifier = Modifier.focusRequester(focusRequester)
