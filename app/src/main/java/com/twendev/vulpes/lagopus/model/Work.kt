@@ -4,25 +4,25 @@ import android.util.Log
 import com.google.gson.annotations.SerializedName
 
 data class Work (
-    @SerializedName("id"           ) val id           : Int,
-    @SerializedName("disciplineId" ) val disciplineId : Int,
-    @SerializedName("workTypeId"   ) val workTypeId   : Int,
-    @SerializedName("semesterId"   ) val semesterId   : Int,
-    @SerializedName("number"       ) val number       : Int,
+    @SerializedName("id"           ) val id           : Int = 0,
+    @SerializedName("disciplineId" ) val disciplineId : Int = 0,
+    @SerializedName("workTypeId"   ) val workTypeId   : Int = 0,
+    @SerializedName("semesterId"   ) val semesterId   : Int = 0,
+    @SerializedName("number"       ) val number       : Int = 0,
     @SerializedName("theme"        ) val theme        : String?     = null,
-    @SerializedName("taskCount"    ) val taskCount    : Int,
-    @SerializedName("taskFor3"     ) val taskFor3     : Int,
-    @SerializedName("taskFor4"     ) val taskFor4     : Int,
-    @SerializedName("taskFor5"     ) val taskFor5     : Int,
-    @SerializedName("discipline"   ) val discipline   : Discipline,
-    @SerializedName("semester"     ) val semester     : Semester,
-    @SerializedName("workType"     ) val workType     : WorkType
+    @SerializedName("taskCount"    ) val taskCount    : Int?        = null,
+    @SerializedName("taskFor3"     ) val taskFor3     : Int?        = null,
+    @SerializedName("taskFor4"     ) val taskFor4     : Int?        = null,
+    @SerializedName("taskFor5"     ) val taskFor5     : Int?        = null,
+    @SerializedName("discipline"   ) val discipline   : Discipline? = null,
+    @SerializedName("semester"     ) val semester     : Semester?   = null,
+    @SerializedName("workType"     ) val workType     : WorkType?   = null
 ) {
     fun isSimular(compareText: String) : Boolean {
-        Log.d("Work","IsSimular($compareText) with ${workType.name}")
-        return (workType.getShortName().plus(number)).startsWith(compareText.lowercase())
+        Log.d("Work","IsSimular($compareText) with ${workType?.name}")
+        return (workType?.getShortName().plus(number)).startsWith(compareText.lowercase())
     }
     override fun toString(): String {
-        return "${workType.getShortName()}$number $theme"
+        return "${workType?.getShortName()}$number $theme"
     }
 }
