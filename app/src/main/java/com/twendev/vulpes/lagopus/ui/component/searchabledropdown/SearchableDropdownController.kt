@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 
 class SearchableDropdownController<T>(
     list: List<T>,
+    selected : T? = null,
     var onSelect : (T) -> Unit = {},
     var onKeyboardAction : ((String) -> Unit)? = null,
     var onSearchChange: ((String) -> Unit)? = null
@@ -15,6 +16,12 @@ class SearchableDropdownController<T>(
     val uiState = _uiState.asStateFlow()
 
     val items = list.toMutableStateList()
+
+    init {
+        if (selected != null) {
+            updateSelectedItem(selected)
+        }
+    }
 
     fun switchExpand(state: Boolean? = null) {
         updateExpanded(state ?: !uiState.value.isExpanded)

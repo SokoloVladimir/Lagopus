@@ -1,6 +1,7 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
 import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
@@ -18,8 +19,11 @@ sealed class Screen(val route: String, val icon: ImageVector) {
     object WorkBrowseScreen : Screen("workbrowse", Icons.Filled.PlayArrow)
     object WorkAlterScreen : Screen("workalter", Icons.Filled.AddCircle)
 
-    fun createRoute(url : String?) : String {
+    fun createWithInstance(url : String?) : String {
         return "$route?instance=$url"
+    }
+    fun createWithId(id : Int) : String {
+        return "$route?id=$id"
     }
     override fun toString(): String {
         return route

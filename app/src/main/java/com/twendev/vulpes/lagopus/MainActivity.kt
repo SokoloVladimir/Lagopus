@@ -34,6 +34,7 @@ import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.edit.WorkAlterScreen
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -60,7 +61,8 @@ class MainActivity : ComponentActivity() {
                         Screen.MainScreen,
                         Screen.DisciplineBrowseScreen,
                         Screen.WorkTypeBrowseScreen,
-                        Screen.WorkBrowseScreen
+                        Screen.WorkBrowseScreen,
+                        Screen.SemesterBrowseScreen
                     )
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
@@ -110,9 +112,9 @@ class MainActivity : ComponentActivity() {
                                                 throw IllegalArgumentException("wrong URL")
                                             }
 
-                                            Log.d("MA", Screen.MainScreen.createRoute(url))
+                                            Log.d("MA", Screen.MainScreen.createWithInstance(url))
                                             ZerdaService.Singleton = ZerdaService(url)
-                                            navController.navigate(Screen.MainScreen.createRoute(url))
+                                            navController.navigate(Screen.MainScreen.createWithInstance(url))
                                             true
                                         } catch (ex : Exception) {
                                             Log.d("MA:ex", ex.message ?: "empty")
@@ -126,7 +128,7 @@ class MainActivity : ComponentActivity() {
                                     MainScreen(padding = innerPadding)
                                 }
                                 composable(
-                                    route = Screen.MainScreen.createRoute("{url}"),
+                                    route = Screen.MainScreen.createWithInstance("{url}"),
                                     arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
                                 ) {
                                     MainScreen(padding = innerPadding)
@@ -144,12 +146,26 @@ class MainActivity : ComponentActivity() {
                                 composable(
                                     route = Screen.WorkBrowseScreen.route
                                 ) {
-                                    WorkBrowseScreen(padding = innerPadding, snackbarHostState)
+                                    WorkBrowseScreen(padding = innerPadding, snackbarHostState, navController)
                                 }
                                 composable(
                                     route = Screen.SemesterBrowseScreen.route
                                 ) {
                                     SemesterBrowseScreen(padding = innerPadding, snackbarHostState)
+                                }
+                                composable(
+                                    route = Screen.WorkAlterScreen.route + "?id={id}",
+                                    arguments = listOf(
+                                        navArgument("id") {
+                                            type = NavType.IntType
+                                        }
+                                    )
+                                ) {
+                                    WorkAlterScreen(
+                                        padding = innerPadding,
+                                        snackBarHostState = snackbarHostState,
+                                        workId = it.arguments?.getInt("id") ?: -1
+                                    )
                                 }
                             }
                         }
