@@ -1,8 +1,9 @@
 package com.twendev.vulpes.lagopus.ui.repository
 
 interface RepositoryInterface<T> {
-    suspend fun pullAndGet(): List<T>
-    suspend fun updateAndPush(obj: T)
-    suspend fun deleteAndPush(obj: T)
-    suspend fun createAndPush(obj: T) : T
+    suspend fun get(id: Int) : T?
+    suspend fun get(): List<T>
+    suspend fun update(obj: T)
+    suspend fun delete(obj: T)
+    suspend fun create(obj: T) : T
 }

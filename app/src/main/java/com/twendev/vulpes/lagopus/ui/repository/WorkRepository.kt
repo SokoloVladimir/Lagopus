@@ -6,16 +6,19 @@ import com.twendev.vulpes.lagopus.model.Work
 class WorkRepository : RepositoryInterface<Work> {
     private val zerdaSource = ZerdaService.Singleton
 
-    override suspend fun pullAndGet(): List<Work> {
+    override suspend fun get(id: Int) : Work? {
+        return zerdaSource.api.getWorks().firstOrNull { it.id == id}
+    }
+    override suspend fun get(): List<Work> {
         return zerdaSource.api.getWorks().toList()
     }
-    override suspend fun updateAndPush(obj: Work) {
+    override suspend fun update(obj: Work) {
         return zerdaSource.api.putWork(obj)
     }
-    override suspend fun createAndPush(obj: Work) : Work {
+    override suspend fun create(obj: Work) : Work {
         return zerdaSource.api.postWork(obj)
     }
-    override suspend fun deleteAndPush(obj: Work) {
+    override suspend fun delete(obj: Work) {
         zerdaSource.api.deleteWork(obj.id)
     }
 }
