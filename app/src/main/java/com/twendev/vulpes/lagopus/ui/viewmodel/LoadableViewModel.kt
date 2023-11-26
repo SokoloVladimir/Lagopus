@@ -22,8 +22,8 @@ enum class LoadingStatus {
 }
 
 abstract class LoadableViewModel : ViewModel()  {
-    private val _uiState = MutableStateFlow(LoadingUiState())
-    val uiState: StateFlow<LoadingUiState> = _uiState.asStateFlow()
+    private val _loadingUiState = MutableStateFlow(LoadingUiState())
+    val loadingUiState: StateFlow<LoadingUiState> = _loadingUiState.asStateFlow()
 
     protected fun suspendActionWithLoading(status: LoadingStatus = LoadingStatus.Full, action: suspend () -> Unit) {
         setLoadingState(status)
@@ -38,6 +38,6 @@ abstract class LoadableViewModel : ViewModel()  {
         }
     }
     private fun setLoadingState(state: LoadingStatus) {
-        _uiState.update { it.copy(loading = state) }
+        _loadingUiState.update { it.copy(loading = state) }
     }
 }
