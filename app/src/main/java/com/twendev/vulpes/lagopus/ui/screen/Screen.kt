@@ -16,6 +16,7 @@ sealed class Screen(val route: String, val icon: ImageVector) {
     object WorkTypeBrowseScreen : Screen("worktypebrowse", Icons.Filled.Build)
     object SemesterBrowseScreen : Screen("semesterbrowse", Icons.Filled.Info)
     object WorkBrowseScreen : Screen("workbrowse", Icons.Filled.PlayArrow)
+    object WorkAlterScreen : Screen("workalter", Icons.Filled.AddCircle)
 
     fun createRoute(url : String?) : String {
         return "$route?instance=$url"

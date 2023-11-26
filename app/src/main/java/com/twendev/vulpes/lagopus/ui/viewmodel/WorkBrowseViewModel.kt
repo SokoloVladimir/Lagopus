@@ -6,44 +6,71 @@ import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.repository.Repositories
 import com.twendev.vulpes.lagopus.ui.repository.WorkRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+data class WorkBrowseUiState(
+    val disciplines: List<Discipline> = listOf(),
+    val workTypes: List<WorkType> = listOf(),
+    val selectedDiscipline: Discipline? = null,
+    val selectedWorkType: WorkType? = null
+)
 
 class WorkBrowseViewModel : LoadableViewModel() {
     private val repository = WorkRepository()
 
-    val items = mutableStateListOf<Work>()
-    var disciplines = listOf<Discipline>()
-    var workTypes = listOf<WorkType>()
+    private val _uiState = MutableStateFlow(WorkBrowseUiState())
+    val uiState: StateFlow<WorkBrowseUiState> = _uiState.asStateFlow()
 
+    val items = mutableStateListOf<Work>()
     private val itemsTrash = mutableListOf<Work>()
 
     init {
         refresh()
     }
 
+    fun filterByDiscipline(discipline: Discipline?) {
+        _uiState.update {
+            it.copy(selectedDiscipline = discipline)
+        }
+    }
+
+    fun filterByWorkType(workType: WorkType?) {
+        _uiState.update {
+            it.copy(selectedWorkType = workType)
+        }
+    }
+
     private fun refresh() {
         suspendActionWithLoading {
             items.clear()
-            disciplines = Repositories.discipline.pullAndGet()
-            workTypes = Repositories.workType.pullAndGet()
-            items.addAll(repository.pullAndGet().toMutableList())
+            _uiState.update {
+                it.copy(
+                    disciplines = Repositories.discipline.get(),
+                    workTypes = Repositories.workType.get()
+                )
+            }
+            items.addAll(repository.get().toMutableList())
         }
     }
 
     fun updateItem(item: Work) {
         suspendAction {
-            repository.updateAndPush(item)
+            repository.update(item)
         }
     }
 
     fun deleteItem(item: Work) {
         suspendAction {
-            repository.deleteAndPush(item)
+            repository.delete(item)
         }
     }
 
     fun createItem(item: Work) {
         suspendActionWithLoading {
-            val createdItem = repository.createAndPush(item)
+            val createdItem = repository.create(item)
             items.add(createdItem)
         }
     }
@@ -59,7 +86,7 @@ class WorkBrowseViewModel : LoadableViewModel() {
         }
 
         suspendAction {
-            repository.deleteAndPush(item)
+            repository.delete(item)
             itemsTrash.remove(item)
         }
     }
