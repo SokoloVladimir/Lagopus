@@ -64,7 +64,7 @@ fun WorkTypeBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHost
     Log.d("WorkTypeBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(WorkTypeBrowseViewModel()) }
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.loadingUiState.collectAsState()
     val scope = rememberCoroutineScope()
 
     WorkTypeBrowseScreenContent(

@@ -64,7 +64,7 @@ fun DisciplineBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHo
     Log.d("DisciplineViewScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(DisciplineBrowseViewModel()) }
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.loadingUiState.collectAsState()
     val scope = rememberCoroutineScope()
 
     DisciplineBrowseScreenContent(

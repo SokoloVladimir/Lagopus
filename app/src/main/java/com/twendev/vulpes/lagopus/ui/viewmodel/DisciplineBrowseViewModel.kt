@@ -22,13 +22,13 @@ class DisciplineBrowseViewModel : LoadableViewModel() {
         }
 
         suspendAction {
-            repository.updateAndPush(item)
+            repository.update(item)
         }
     }
 
     fun deleteItem(item: Discipline) {
         suspendAction {
-            repository.deleteAndPush(item)
+            repository.delete(item)
         }
     }
 
@@ -38,7 +38,7 @@ class DisciplineBrowseViewModel : LoadableViewModel() {
         }
 
         suspendActionWithLoading {
-            val createdItem = repository.createAndPush(item)
+            val createdItem = repository.create(item)
             items.add(createdItem)
         }
     }
@@ -46,7 +46,7 @@ class DisciplineBrowseViewModel : LoadableViewModel() {
     private fun refresh() {
         suspendActionWithLoading {
             items.clear()
-            items.addAll(repository.pullAndGet().toMutableList())
+            items.addAll(repository.get().toMutableList())
         }
     }
 
@@ -61,7 +61,7 @@ class DisciplineBrowseViewModel : LoadableViewModel() {
         }
 
         suspendAction {
-            repository.deleteAndPush(item)
+            repository.delete(item)
             itemsTrash.remove(item)
         }
     }
