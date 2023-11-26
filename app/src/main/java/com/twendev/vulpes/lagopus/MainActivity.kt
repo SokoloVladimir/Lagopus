@@ -31,6 +31,7 @@ import androidx.navigation.navArgument
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
@@ -144,6 +145,11 @@ class MainActivity : ComponentActivity() {
                                     route = Screen.WorkBrowseScreen.route
                                 ) {
                                     WorkBrowseScreen(padding = innerPadding, snackbarHostState)
+                                }
+                                composable(
+                                    route = Screen.SemesterBrowseScreen.route
+                                ) {
+                                    SemesterBrowseScreen(padding = innerPadding, snackbarHostState)
                                 }
                             }
                         }
