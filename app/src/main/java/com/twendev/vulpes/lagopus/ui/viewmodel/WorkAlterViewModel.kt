@@ -27,6 +27,26 @@ class WorkAlterViewModel(private val itemId: Int) : LoadableViewModel() {
         refresh()
     }
 
+    fun saveItem() {
+        if (_uiState.value.item.id == 0) {
+            suspendActionWithLoading {
+                repository.create(_uiState.value.item)
+            }
+        } else {
+            suspendActionWithLoading {
+                repository.update(_uiState.value.item)
+            }
+        }
+
+
+    }
+
+    fun deleteItem() {
+        suspendActionWithLoading {
+            repository.delete(_uiState.value.item)
+        }
+    }
+
     fun updateItem(item: Work) {
         _uiState.update {
             it.copy(

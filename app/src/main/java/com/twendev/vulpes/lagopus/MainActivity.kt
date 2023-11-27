@@ -164,6 +164,9 @@ class MainActivity : ComponentActivity() {
                                     WorkAlterScreen(
                                         padding = innerPadding,
                                         snackBarHostState = snackbarHostState,
+                                        navigateBack = {
+                                            navController.navigateUp()
+                                        },
                                         workId = it.arguments?.getInt("id") ?: -1
                                     )
                                 }

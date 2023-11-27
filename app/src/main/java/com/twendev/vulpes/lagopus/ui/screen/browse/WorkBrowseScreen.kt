@@ -149,7 +149,7 @@ fun WorkBrowseScreenContent(
                     item {
                         IconButton(
                             onClick = {
-                                viewModel.createItem(Work())
+                                navToWorkById(0)
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
