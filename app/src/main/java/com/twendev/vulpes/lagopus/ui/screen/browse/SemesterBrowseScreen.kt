@@ -55,6 +55,7 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.SemesterBrowseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @Composable
 fun SemesterBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
@@ -134,7 +135,7 @@ fun SemesterBrowseScreenContent(
             item {
                 IconButton(
                     onClick = {
-                        viewModel.createItem(Semester())
+                        viewModel.createItem(getCurrentSemester())
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -190,7 +191,7 @@ fun SemesterCardContent(
     onYearChange: (Int) -> Unit,
     onIsSecondChange: (Boolean) -> Unit,
     onDeleteClick: () -> Unit,
-    yearMin: Int = 2010,
+    yearMin: Int = 2020,
     yearMax: Int = 2100
 ) {
     OutlinedCard(
@@ -274,4 +275,15 @@ fun SemesterCardContent(
             }
         }
     }
+}
+
+fun getCurrentSemester() : Semester {
+    val cal = Calendar.getInstance()
+    val year = cal.get(Calendar.YEAR)
+    return if (cal.get(Calendar.MONTH) < 9) {
+        Semester(startYear = year  - 1, isSecond = true)
+    } else {
+        Semester(startYear = year, isSecond = false)
+    }
+
 }
