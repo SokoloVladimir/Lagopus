@@ -40,7 +40,6 @@ import kotlin.math.roundToInt
 
 @Composable
 fun WorkAlterScreen(
-    padding: PaddingValues,
     snackBarHostState: SnackbarHostState,
     navigateBack: () -> Unit,
     workId: Int
@@ -49,26 +48,24 @@ fun WorkAlterScreen(
     val loadingUiState = viewModel.loadingUiState.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
 
-    Box( Modifier.padding(padding) ) {
-        WorkAlterScreenContent(
-            loadingUiState = loadingUiState.value,
-            item = uiState.value.item,
-            disciplines = uiState.value.disciplines,
-            workTypes = uiState.value.workTypes,
-            semesters = uiState.value.semesters,
-            onItemUpdate = {
-                viewModel.updateItem(it)
-            },
-            onItemSave = {
-                viewModel.saveItem()
-                navigateBack()
-            },
-            onItemDelete = {
-                viewModel.deleteItem()
-                navigateBack()
-            }
-        )
-    }
+    WorkAlterScreenContent(
+        loadingUiState = loadingUiState.value,
+        item = uiState.value.item,
+        disciplines = uiState.value.disciplines,
+        workTypes = uiState.value.workTypes,
+        semesters = uiState.value.semesters,
+        onItemUpdate = {
+            viewModel.updateItem(it)
+        },
+        onItemSave = {
+            viewModel.saveItem()
+            navigateBack()
+        },
+        onItemDelete = {
+            viewModel.deleteItem()
+            navigateBack()
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

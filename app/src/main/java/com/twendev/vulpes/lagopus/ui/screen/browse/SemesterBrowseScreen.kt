@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
-fun SemesterBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
+fun SemesterBrowseScreen(snackBarHostState: SnackbarHostState) {
     Log.d("SemesterBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(SemesterBrowseViewModel()) }

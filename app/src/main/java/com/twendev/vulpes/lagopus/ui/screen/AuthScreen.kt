@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AuthScreen(
-    innerPadding: PaddingValues,
     navigateToMainScreen : suspend (instance: String) -> Boolean,
     showMessage : (message: String) -> Unit
 ) {

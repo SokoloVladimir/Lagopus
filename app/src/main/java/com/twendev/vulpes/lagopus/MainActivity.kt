@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -102,73 +104,76 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
-                                composable(
-                                    route = Screen.AuthScreen.route
-                                ) {
-                                    AuthScreen(innerPadding = innerPadding, showMessage = displaySnackBar, navigateToMainScreen = { url ->
-                                        try {
-                                            if (!url.contains("http")) {
-                                                throw IllegalArgumentException("wrong URL")
-                                            }
+                            Box(
+                                Modifier.padding(innerPadding)
+                            ) {
+                                NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
+                                    composable(
+                                        route = Screen.AuthScreen.route
+                                    ) {
+                                        AuthScreen(showMessage = displaySnackBar, navigateToMainScreen = { url ->
+                                            try {
+                                                if (!url.contains("http")) {
+                                                    throw IllegalArgumentException("wrong URL")
+                                                }
 
-                                            Log.d("MA", Screen.MainScreen.createWithInstance(url))
-                                            ZerdaService.Singleton = ZerdaService(url)
-                                            navController.navigate(Screen.MainScreen.createWithInstance(url))
-                                            true
-                                        } catch (ex : Exception) {
-                                            Log.d("MA:ex", ex.message ?: "empty")
-                                            false
-                                        }
-                                    })
-                                }
-                                composable(
-                                    route = Screen.MainScreen.route
-                                ) {
-                                    MainScreen(padding = innerPadding)
-                                }
-                                composable(
-                                    route = Screen.MainScreen.createWithInstance("{url}"),
-                                    arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
-                                ) {
-                                    MainScreen(padding = innerPadding)
-                                }
-                                composable(
-                                    route = Screen.DisciplineBrowseScreen.route
-                                ) {
-                                    DisciplineBrowseScreen(padding = innerPadding, snackbarHostState)
-                                }
-                                composable(
-                                    route = Screen.WorkTypeBrowseScreen.route
-                                ) {
-                                    WorkTypeBrowseScreen(padding = innerPadding, snackbarHostState)
-                                }
-                                composable(
-                                    route = Screen.WorkBrowseScreen.route
-                                ) {
-                                    WorkBrowseScreen(padding = innerPadding, snackbarHostState, navController)
-                                }
-                                composable(
-                                    route = Screen.SemesterBrowseScreen.route
-                                ) {
-                                    SemesterBrowseScreen(padding = innerPadding, snackbarHostState)
-                                }
-                                composable(
-                                    route = Screen.WorkAlterScreen.route + "?id={id}",
-                                    arguments = listOf(
-                                        navArgument("id") {
-                                            type = NavType.IntType
-                                        }
-                                    )
-                                ) {
-                                    WorkAlterScreen(
-                                        padding = innerPadding,
-                                        snackBarHostState = snackbarHostState,
-                                        navigateBack = {
-                                            navController.navigateUp()
-                                        },
-                                        workId = it.arguments?.getInt("id") ?: -1
-                                    )
+                                                Log.d("MA", Screen.MainScreen.createWithInstance(url))
+                                                ZerdaService.Singleton = ZerdaService(url)
+                                                navController.navigate(Screen.MainScreen.createWithInstance(url))
+                                                true
+                                            } catch (ex : Exception) {
+                                                Log.d("MA:ex", ex.message ?: "empty")
+                                                false
+                                            }
+                                        })
+                                    }
+                                    composable(
+                                        route = Screen.MainScreen.route
+                                    ) {
+                                        MainScreen()
+                                    }
+                                    composable(
+                                        route = Screen.MainScreen.createWithInstance("{url}"),
+                                        arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
+                                    ) {
+                                        MainScreen()
+                                    }
+                                    composable(
+                                        route = Screen.DisciplineBrowseScreen.route
+                                    ) {
+                                        DisciplineBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.WorkTypeBrowseScreen.route
+                                    ) {
+                                        WorkTypeBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.WorkBrowseScreen.route
+                                    ) {
+                                        WorkBrowseScreen(snackbarHostState, navController)
+                                    }
+                                    composable(
+                                        route = Screen.SemesterBrowseScreen.route
+                                    ) {
+                                        SemesterBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.WorkAlterScreen.route + "?id={id}",
+                                        arguments = listOf(
+                                            navArgument("id") {
+                                                type = NavType.IntType
+                                            }
+                                        )
+                                    ) {
+                                        WorkAlterScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            navigateBack = {
+                                                navController.navigateUp()
+                                            },
+                                            workId = it.arguments?.getInt("id") ?: -1
+                                        )
+                                    }
                                 }
                             }
                         }

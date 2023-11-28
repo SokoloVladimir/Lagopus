@@ -24,7 +24,7 @@ import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDrop
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
 
 @Composable
-fun MainScreen(padding: PaddingValues)
+fun MainScreen()
 {
     var loadingStatus by remember { mutableStateOf(false) }
     val zerda = ZerdaService.Singleton

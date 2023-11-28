@@ -60,7 +60,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun DisciplineBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
+fun DisciplineBrowseScreen(snackBarHostState: SnackbarHostState) {
     Log.d("DisciplineViewScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(DisciplineBrowseViewModel()) }

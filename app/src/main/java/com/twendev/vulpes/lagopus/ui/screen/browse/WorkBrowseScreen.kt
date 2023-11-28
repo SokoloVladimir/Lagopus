@@ -54,7 +54,7 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun WorkBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState, navController : NavController) {
+fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, navController : NavController) {
     Log.d("WorkBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(WorkBrowseViewModel()) }

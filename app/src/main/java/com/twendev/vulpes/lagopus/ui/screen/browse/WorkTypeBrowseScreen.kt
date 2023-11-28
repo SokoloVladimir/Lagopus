@@ -60,7 +60,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun WorkTypeBrowseScreen(padding: PaddingValues, snackBarHostState: SnackbarHostState) {
+fun WorkTypeBrowseScreen(snackBarHostState: SnackbarHostState) {
     Log.d("WorkTypeBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(WorkTypeBrowseViewModel()) }
