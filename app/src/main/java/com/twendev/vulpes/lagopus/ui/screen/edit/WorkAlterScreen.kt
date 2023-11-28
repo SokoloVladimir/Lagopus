@@ -212,12 +212,14 @@ private fun WorkAlterScreenContent(
                     .weight(1f, false)
                     .fillMaxWidth()
             ) {
-                OutlinedButton(
-                    onClick = { onItemDelete() },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = "delete")
-                    Text("Удалить")
+                if (item.id != 0) {
+                    OutlinedButton(
+                        onClick = { onItemDelete() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(imageVector = Icons.Outlined.Delete, contentDescription = "delete")
+                        Text("Удалить")
+                    }
                 }
                 OutlinedButton(
                     onClick = { onItemSave() },
