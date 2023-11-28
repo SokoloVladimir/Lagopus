@@ -103,7 +103,8 @@ private fun WorkAlterScreenContent(
                     value = item.theme,
                     label = { Text(text = "Тема") },
                     singleLine = true,
-                    onValueChange = { onItemUpdate(item.copy(theme = it)) }
+                    onValueChange = { onItemUpdate(item.copy(theme = it)) },
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(10.dp))
 
@@ -113,7 +114,8 @@ private fun WorkAlterScreenContent(
                         onItemUpdate(item.copy(discipline = it, disciplineId = it.id))
                     },
                     placeholder = "Дисциплина",
-                    preselectedItem = item.discipline
+                    preselectedItem = item.discipline,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(10.dp))
 
@@ -123,7 +125,8 @@ private fun WorkAlterScreenContent(
                         onItemUpdate(item.copy(workType = it, workTypeId = it.id))
                     },
                     placeholder = "Тип работы",
-                    preselectedItem = item.workType
+                    preselectedItem = item.workType,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(10.dp))
 
@@ -133,7 +136,8 @@ private fun WorkAlterScreenContent(
                         onItemUpdate(item.copy(semester = it, semesterId = it.id))
                     },
                     placeholder = "Семестр",
-                    preselectedItem = item.semester
+                    preselectedItem = item.semester,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(10.dp))
 
