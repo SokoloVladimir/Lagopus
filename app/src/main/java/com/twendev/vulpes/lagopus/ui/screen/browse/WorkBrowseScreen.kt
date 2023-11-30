@@ -34,7 +34,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,16 +41,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.twendev.vulpes.lagopus.model.Discipline
+import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
+import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
-import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
-import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
+import com.twendev.vulpes.lagopus.ui.component.dropdown.OutlinedDropdown
 import com.twendev.vulpes.lagopus.ui.screen.Screen
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, navController : NavController) {
@@ -60,17 +60,24 @@ fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, navController : NavCo
     val viewModel by remember { mutableStateOf(WorkBrowseViewModel()) }
     val loadingUiState = viewModel.loadingUiState.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
-    val scope = rememberCoroutineScope()
 
     WorkBrowseScreenContent(
         loadingUiState = loadingUiState.value,
         uiState = uiState.value,
         viewModel = viewModel,
         snackBarHostState = snackBarHostState,
-        coroutineScope = scope,
+        filterByDiscipline = {
+            viewModel.filterByDiscipline(it)
+        },
+        filterByWorkType = {
+            viewModel.filterByWorkType(it)
+        },
+        filterBySemester = {
+            viewModel.filterBySemester(it)
+        },
         navToWorkById = {
             navController.navigate(Screen.WorkAlterScreen.createWithId(it))
-        }
+        },
     )
 }
 
@@ -80,7 +87,9 @@ fun WorkBrowseScreenContent(
     uiState: WorkBrowseUiState,
     viewModel: WorkBrowseViewModel,
     snackBarHostState : SnackbarHostState,
-    coroutineScope : CoroutineScope,
+    filterByDiscipline : (Discipline) -> Unit,
+    filterByWorkType : (WorkType) -> Unit,
+    filterBySemester : (Semester) -> Unit,
     navToWorkById: (Int) -> Unit
 ) {
     Box {
@@ -95,16 +104,6 @@ fun WorkBrowseScreenContent(
         }
 
         if (loadingUiState.loading != LoadingStatus.Full) {
-            // TODO: нарушение stateless
-            val disciplineController by remember { mutableStateOf(SearchableDropdownController(list = uiState.disciplines)) }
-            val workTypeController by remember { mutableStateOf(SearchableDropdownController(list = uiState.workTypes)) }
-
-            disciplineController.onSelect = { viewModel.filterByDiscipline(it) }
-            disciplineController.onSearchChange = { viewModel.filterByDiscipline(null) }
-
-            workTypeController.onSelect = { viewModel.filterByWorkType(it) }
-            workTypeController.onSearchChange = { viewModel.filterByWorkType(null) }
-
             var isFilterExpanded by remember { mutableStateOf(false) }
             Column {
                 Column(Modifier.padding(15.dp)) {
@@ -118,8 +117,11 @@ fun WorkBrowseScreenContent(
                     }
                     AnimatedVisibility(visible = isFilterExpanded) {
                         Column {
-                            SearchableDropdown(placeholder = "Дисциплина", controller = disciplineController)
-                            SearchableDropdown(placeholder = "Тип работы", controller = workTypeController)
+                            // TODO: завести string resources
+                            // TODO: переписать dropdown на resetable/добавить рядом кнопку сброса
+                            OutlinedDropdown(items = uiState.disciplines, onSelect = filterByDiscipline, placeholder = "Дисциплина")
+                            OutlinedDropdown(items = uiState.workTypes, onSelect = filterByWorkType, placeholder = "Тип работы")
+                            OutlinedDropdown(items = uiState.semesters, onSelect = filterBySemester, placeholder = "Семестр")
                         }
                     }
                 }

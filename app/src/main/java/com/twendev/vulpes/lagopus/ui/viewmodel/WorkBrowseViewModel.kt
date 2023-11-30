@@ -2,6 +2,7 @@ package com.twendev.vulpes.lagopus.ui.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import com.twendev.vulpes.lagopus.model.Discipline
+import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.repository.Repositories
@@ -14,8 +15,10 @@ import kotlinx.coroutines.flow.update
 data class WorkBrowseUiState(
     val disciplines: List<Discipline> = listOf(),
     val workTypes: List<WorkType> = listOf(),
+    val semesters: List<Semester> = listOf(),
     val selectedDiscipline: Discipline? = null,
-    val selectedWorkType: WorkType? = null
+    val selectedWorkType: WorkType? = null,
+    val selectedSemester: Semester? = null
 )
 
 class WorkBrowseViewModel : LoadableViewModel() {
@@ -43,13 +46,20 @@ class WorkBrowseViewModel : LoadableViewModel() {
         }
     }
 
+    fun filterBySemester(semester: Semester?) {
+        _uiState.update {
+            it.copy(selectedSemester = semester)
+        }
+    }
+
     private fun refresh() {
         suspendActionWithLoading {
             items.clear()
             _uiState.update {
                 it.copy(
                     disciplines = Repositories.discipline.get(),
-                    workTypes = Repositories.workType.get()
+                    workTypes = Repositories.workType.get(),
+                    semesters = Repositories.semester.get()
                 )
             }
             items.addAll(repository.get().toMutableList())
