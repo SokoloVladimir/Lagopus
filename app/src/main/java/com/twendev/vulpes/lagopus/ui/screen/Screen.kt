@@ -2,6 +2,7 @@ package com.twendev.vulpes.lagopus.ui.screen
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
@@ -41,6 +42,10 @@ sealed class Screen(
     object WorkAlterScreen : Screen(
         route = "workalter",
         icon = Icons.Filled.AddCircle
+    )
+    object GroupBrowseScreen : Screen(
+        route = "groupbrowse",
+        icon = Icons.Filled.ArrowBack
     )
     object NotFound : Screen(
         route = "notfound",

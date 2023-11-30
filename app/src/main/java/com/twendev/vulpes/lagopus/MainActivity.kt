@@ -36,6 +36,7 @@ import androidx.navigation.navArgument
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
@@ -67,7 +68,8 @@ class MainActivity : ComponentActivity() {
                         Screen.DisciplineBrowseScreen,
                         Screen.WorkTypeBrowseScreen,
                         Screen.WorkBrowseScreen,
-                        Screen.SemesterBrowseScreen
+                        Screen.SemesterBrowseScreen,
+                        Screen.GroupBrowseScreen
                     )
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     var topAppBar : (@Composable () -> Unit) by remember { mutableStateOf({ }) }
@@ -164,6 +166,11 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.SemesterBrowseScreen.route
                                     ) {
                                         SemesterBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.GroupBrowseScreen.route
+                                    ) {
+                                        GroupBrowseScreen(snackbarHostState)
                                     }
                                     composable(
                                         route = Screen.WorkAlterScreen.route + "?id={id}",
