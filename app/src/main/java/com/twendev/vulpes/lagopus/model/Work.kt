@@ -4,21 +4,25 @@ import android.util.Log
 import com.google.gson.annotations.SerializedName
 
 data class Work (
-    @SerializedName("id"           ) var id           : Int,
-    @SerializedName("disciplineId" ) var disciplineId : Int,
-    @SerializedName("workTypeId"   ) var workTypeId   : Int,
-    @SerializedName("number"       ) var number       : Int,
-    @SerializedName("theme"        ) var theme        : String?     = null,
-    @SerializedName("dateEst"      ) var dateEst      : String?     = null,
-    @SerializedName("taskCount"    ) var taskCount    : Int,
-    @SerializedName("discipline"   ) var discipline   : Discipline,
-    @SerializedName("workType"     ) var workType     : WorkType
+    @SerializedName("id"           ) val id           : Int         = 0,
+    @SerializedName("disciplineId" ) val disciplineId : Int         = 0,
+    @SerializedName("workTypeId"   ) val workTypeId   : Int         = 0,
+    @SerializedName("semesterId"   ) val semesterId   : Int         = 0,
+    @SerializedName("number"       ) val number       : Int         = 0,
+    @SerializedName("theme"        ) val theme        : String      = "",
+    @SerializedName("taskCount"    ) val taskCount    : Int         = 5,
+    @SerializedName("taskFor3"     ) val taskFor3     : Int         = 3,
+    @SerializedName("taskFor4"     ) val taskFor4     : Int         = 4,
+    @SerializedName("taskFor5"     ) val taskFor5     : Int         = 5,
+    @SerializedName("discipline"   ) val discipline   : Discipline? = null,
+    @SerializedName("semester"     ) val semester     : Semester?   = null,
+    @SerializedName("workType"     ) val workType     : WorkType?   = null
 ) {
     fun isSimular(compareText: String) : Boolean {
-        Log.d("Work","IsSimular($compareText) with ${workType.name}")
-        return (workType.getShortName().plus(number)).startsWith(compareText.lowercase())
+        Log.d("Work","IsSimular($compareText) with ${workType?.name}")
+        return (workType?.getShortName().plus(number)).startsWith(compareText.lowercase())
     }
     override fun toString(): String {
-        return "${workType.getShortName()}$number $theme"
+        return "${workType?.getShortName()}$number $theme"
     }
 }

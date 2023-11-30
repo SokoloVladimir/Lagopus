@@ -25,20 +25,22 @@ fun <T> SearchableDropdown(
 
     SearchableDropdownContent(
         placeholder = placeholder,
-        isExpanded = uiState.isExpanded,
-        value = uiState.selectedText,
-        filteredItems = uiState.filteredList,
+        uiState = uiState,
+        items = controller.items,
         onExpandedChange = {
-            controller.SwitchExpand()
+            controller.switchExpand()
         },
         onSelectionChanged = { selection : String ->
-            controller.ChangeSelection(selection)
+            controller.changeSelection(selection)
         },
         onKeyboardAction = { selection: String ->
-            controller.KeyboardAction(selection)
+            controller.keyboardAction(selection)
         },
         onValueChanged = {
-            controller.ChangeSearch(it)
+            controller.changeSearch(it)
+        },
+        isFiltered = {
+            controller.isFilter(it)
         }
     )
 }
@@ -47,40 +49,40 @@ fun <T> SearchableDropdown(
 @Composable
 fun <T> SearchableDropdownContent(
     placeholder: String,
-    isExpanded: Boolean,
-    value: String,
-    filteredItems: List<T>,
+    uiState: SearchableDropdownUiState<T>,
+    items: List<T>,
     onExpandedChange : () -> Unit,
     onSelectionChanged : (selection: String) -> Unit,
     onKeyboardAction : (selection: String) -> Unit,
-    onValueChanged : (String) -> Unit
+    onValueChanged : (String) -> Unit,
+    isFiltered : (T) -> Boolean
 ) {
     Box(
     ) {
         ExposedDropdownMenuBox(
-            expanded = isExpanded,
+            expanded = uiState.isExpanded,
             onExpandedChange = { onExpandedChange() }
         ) {
             OutlinedTextField(
-                value = value,
+                value = uiState.selectedText,
                 onValueChange = onValueChanged,
                 label = { Text(text = placeholder) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = uiState.isExpanded) },
                 modifier = Modifier.menuAnchor(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = {
-                    onKeyboardAction(value)
+                    onKeyboardAction(uiState.selectedText)
                 })
             )
 
-            if (filteredItems.isNotEmpty()) {
-                ExposedDropdownMenu(
-                    expanded = isExpanded,
-                    onDismissRequest = {
-                    }
-                ) {
-                    filteredItems.forEach { item ->
+            ExposedDropdownMenu(
+                expanded = uiState.isExpanded,
+                onDismissRequest = {
+                }
+            ) {
+                items.forEach { item ->
+                    if (isFiltered(item) || uiState.selectedItem != null) {
                         DropdownMenuItem(
                             text = { Text(text = item.toString()) },
                             onClick = {

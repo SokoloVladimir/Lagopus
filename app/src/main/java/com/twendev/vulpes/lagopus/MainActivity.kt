@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,11 +19,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,7 +33,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.screen.*
+import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.edit.WorkAlterScreen
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -54,16 +62,26 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     val navController = rememberNavController()
-                    val screens = listOf(Screen.MainScreen, Screen.DisciplineViewScreen)
+                    val screens = listOf(
+                        Screen.MainScreen,
+                        Screen.DisciplineBrowseScreen,
+                        Screen.WorkTypeBrowseScreen,
+                        Screen.WorkBrowseScreen,
+                        Screen.SemesterBrowseScreen
+                    )
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    var topAppBar : (@Composable () -> Unit) by remember { mutableStateOf({ }) }
+                    val changeTopAppBar : (@Composable () -> Unit) -> Unit = { compose ->
+                        topAppBar = compose
+                    }
+
 
                     ModalNavigationDrawer(
-                        drawerContent = {
-                            Text(text = "drawer")
-                        }
+                        drawerContent = { Text(text = "drawer") }
                     ) {
                         Scaffold(
                             snackbarHost = { SnackbarHost(snackbarHostState) },
+                            topBar = topAppBar,
                             bottomBar = {
                                 if (navBackStackEntry?.destination?.route != Screen.AuthScreen.route) {
                                     NavigationBar {
@@ -72,11 +90,11 @@ class MainActivity : ComponentActivity() {
                                             NavigationBarItem(
                                                 icon = {
                                                     Icon(
-                                                        Icons.Filled.Favorite,
+                                                        screen.icon,
                                                         contentDescription = null
                                                     )
                                                 },
-                                                label = { Text(stringResource(screen.resourceId)) },
+                                                label = { Text(screen.route) },
                                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                                 onClick = {
                                                     navController.navigate(screen.route) {
@@ -93,36 +111,76 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) { innerPadding ->
-                            NavHost(navController = navController, startDestination = Screen.DisciplineViewScreen.route) {
-                                composable(
-                                    route = Screen.AuthScreen.route
-                                ) {
-                                    AuthScreen(innerPadding = innerPadding, showMessage = displaySnackBar, navigateToMainScreen = { url ->
-                                        try {
-                                            if (!url.contains("http")) {
-                                                throw IllegalArgumentException("wrong URL")
-                                            }
+                            Box(
+                                Modifier.padding(innerPadding)
+                            ) {
+                                NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
+                                    composable(
+                                        route = Screen.AuthScreen.route
+                                    ) {
+                                        AuthScreen(showMessage = displaySnackBar, navigateToMainScreen = { url ->
+                                            try {
+                                                if (!url.contains("http")) {
+                                                    throw IllegalArgumentException("wrong URL")
+                                                }
 
-                                            Log.d("MA", Screen.MainScreen.createRoute(url))
-                                            ZerdaService.Singleton = ZerdaService(url)
-                                            navController.navigate(Screen.MainScreen.createRoute(url))
-                                            true
-                                        } catch (ex : Exception) {
-                                            Log.d("MA:ex", ex.message ?: "empty")
-                                            false
-                                        }
-                                    })
-                                }
-                                composable(
-                                    route = Screen.MainScreen.createRoute("{url}"),
-                                    arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
-                                ) {
-                                    MainScreen(padding = innerPadding, instanceUrl = it.arguments?.getString("url"))
-                                }
-                                composable(
-                                    route = Screen.DisciplineViewScreen.route
-                                ) {
-                                    DisciplineViewScreen(padding = innerPadding)
+                                                Log.d("MA", Screen.MainScreen.createWithInstance(url))
+                                                ZerdaService.Singleton = ZerdaService(url)
+                                                navController.navigate(Screen.MainScreen.createWithInstance(url))
+                                                true
+                                            } catch (ex : Exception) {
+                                                Log.d("MA:ex", ex.message ?: "empty")
+                                                false
+                                            }
+                                        })
+                                    }
+                                    composable(
+                                        route = Screen.MainScreen.route
+                                    ) {
+                                        MainScreen()
+                                    }
+                                    composable(
+                                        route = Screen.MainScreen.createWithInstance("{url}"),
+                                        arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
+                                    ) {
+                                        MainScreen()
+                                    }
+                                    composable(
+                                        route = Screen.DisciplineBrowseScreen.route
+                                    ) {
+                                        DisciplineBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.WorkTypeBrowseScreen.route
+                                    ) {
+                                        WorkTypeBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.WorkBrowseScreen.route
+                                    ) {
+                                        WorkBrowseScreen(snackbarHostState, navController)
+                                    }
+                                    composable(
+                                        route = Screen.SemesterBrowseScreen.route
+                                    ) {
+                                        SemesterBrowseScreen(snackbarHostState)
+                                    }
+                                    composable(
+                                        route = Screen.WorkAlterScreen.route + "?id={id}",
+                                        arguments = listOf(
+                                            navArgument("id") {
+                                                type = NavType.IntType
+                                            }
+                                        )
+                                    ) {
+                                        WorkAlterScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            navigateBack = {
+                                                navController.navigateUp()
+                                            },
+                                            workId = it.arguments?.getInt("id") ?: -1
+                                        )
+                                    }
                                 }
                             }
                         }

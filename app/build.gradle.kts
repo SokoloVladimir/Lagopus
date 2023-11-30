@@ -63,6 +63,8 @@ android {
 }
 
 dependencies {
+    implementation("com.chargemap.compose:numberpicker:1.0.3")
+
     val nav_version = "2.7.5"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 

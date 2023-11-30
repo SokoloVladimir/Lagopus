@@ -1,91 +1,87 @@
 package com.twendev.vulpes.lagopus.ui.component.searchabledropdown
 
-import com.twendev.vulpes.lagopus.model.Work
+import androidx.compose.runtime.toMutableStateList
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class SearchableDropdownController<T>(
     list: List<T>,
+    selected : T? = null,
     var onSelect : (T) -> Unit = {},
-    var onKeyboardAction : ((String) -> Unit)? = null
+    var onKeyboardAction : ((String) -> Unit)? = null,
+    var onSearchChange: ((String) -> Unit)? = null
 ) {
-    private val _uiState : MutableStateFlow<SearchableDropdownUiState<T>>
-    val uiState: StateFlow<SearchableDropdownUiState<T>>
+    private val _uiState = MutableStateFlow(SearchableDropdownUiState<T>())
+    val uiState = _uiState.asStateFlow()
+
+    val items = list.toMutableStateList()
 
     init {
-        _uiState = MutableStateFlow(SearchableDropdownUiState(dropdownList = list))
-        uiState = _uiState.asStateFlow()
-    }
-
-    fun SwitchExpand(state: Boolean? = null) {
-        _uiState.update {
-            it.copy(isExpanded = state ?: !it.isExpanded)
-        }
-
-        if (_uiState.value.isExpanded) {
-            Refilter()
+        if (selected != null) {
+            updateSelectedItem(selected)
         }
     }
 
-    fun ChangeSearch(value: String) {
-        _uiState.update {
-            it.copy(
-                selectedText = value
-            )
-        }
+    fun switchExpand(state: Boolean? = null) {
+        updateExpanded(state ?: !uiState.value.isExpanded)
+    }
 
-        Refilter(value)
+    fun changeSearch(value: String) {
+        updateSearchText(value)
+        resetSelectedItem()
+        onSearchChange?.let { it(value) }
     }
 
     /**
      * Функция выбора из списка
      * @return Boolean если выбор успешен
      */
-    fun ChangeSelection(value: String) : Boolean {
-        _uiState.value.dropdownList.forEach { element ->
-            if (element.toString().equals(value, ignoreCase = true)) {
-                _uiState.update { state ->
-                    state.copy(
-                        selectedText = element.toString(),
-                        isExpanded = false
-                    )
-                }
-                onSelect(element)
+    fun changeSelection(value: String) : Boolean {
+        for (item in items) {
+            if (item.toString().equals(value, ignoreCase = true)) {
+                updateSelectedItem(item)
+                switchExpand()
+                onSelect(item)
                 return true
             }
         }
         return false
     }
 
-    fun KeyboardAction(value : String) {
+    fun keyboardAction(value : String) {
         if (onKeyboardAction == null) {
-            ChangeSelection(value)
+            changeSelection(value)
         } else {
             onKeyboardAction?.let { it(value) }
         }
 
     }
 
-    private fun Refilter(value: String? = null) {
-        _uiState.update { state ->
-            state.copy(
-                filteredList = FilterList(state.dropdownList, value ?: state.selectedText),
-            )
+    fun isFilter(item: T) : Boolean {
+        return item.toString().contains(uiState.value.selectedText, ignoreCase = true)
+    }
+    private fun updateSearchText(value: String) {
+        _uiState.update {
+            it.copy(selectedText = value)
         }
     }
 
-    private fun FilterList(listToFilter: List<T>, filterText: String) : List<T> {
-        val filtered: MutableList<T> = (if (listToFilter.firstOrNull() is Work) {
-            listToFilter.filter { (it as Work).isSimular(filterText) }
-        } else {
-            listOf()
-        }).toMutableList()
-
-        filtered += listToFilter.filter {
-            it.toString().contains(filterText, ignoreCase = true)
+    private fun updateSelectedItem(item : T) {
+        _uiState.update {
+            it.copy(selectedItem = item, selectedText = item.toString())
         }
-        return filtered.toList()
+    }
+
+    private fun resetSelectedItem() {
+        _uiState.update {
+            it.copy(selectedItem = null)
+        }
+    }
+
+    private fun updateExpanded(state : Boolean) {
+        _uiState.update {
+            it.copy(isExpanded = state)
+        }
     }
 }

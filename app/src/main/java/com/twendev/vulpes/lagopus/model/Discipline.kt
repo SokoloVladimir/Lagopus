@@ -3,6 +3,10 @@ package com.twendev.vulpes.lagopus.model
 import com.google.gson.annotations.SerializedName
 
 data class Discipline (
-    @SerializedName("id"   ) var id   : Int,
-    @SerializedName("name" ) var name : String
-)
+    @SerializedName("id"   ) val id   : Int = 0,
+    @SerializedName("name" ) val name : String = "Новая дисциплина"
+) {
+    override fun toString(): String {
+        return name
+    }
+}
