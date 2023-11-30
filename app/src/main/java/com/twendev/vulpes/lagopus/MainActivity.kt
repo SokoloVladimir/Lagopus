@@ -19,9 +19,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
@@ -67,14 +70,18 @@ class MainActivity : ComponentActivity() {
                         Screen.SemesterBrowseScreen
                     )
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    var topAppBar : (@Composable () -> Unit) by remember { mutableStateOf({ }) }
+                    val changeTopAppBar : (@Composable () -> Unit) -> Unit = { compose ->
+                        topAppBar = compose
+                    }
+
 
                     ModalNavigationDrawer(
-                        drawerContent = {
-                            Text(text = "drawer")
-                        }
+                        drawerContent = { Text(text = "drawer") }
                     ) {
                         Scaffold(
                             snackbarHost = { SnackbarHost(snackbarHostState) },
+                            topBar = topAppBar,
                             bottomBar = {
                                 if (navBackStackEntry?.destination?.route != Screen.AuthScreen.route) {
                                     NavigationBar {
