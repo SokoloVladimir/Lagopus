@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CardDefaults
@@ -61,7 +63,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun GroupBrowseScreen(snackBarHostState: SnackbarHostState, onAssign: (Group) -> Unit) {
+fun GroupBrowseScreen(snackBarHostState: SnackbarHostState, onAssign: (Group) -> Unit, onBrowseStudents: (Group) -> Unit) {
     Log.d("GroupBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(GroupBrowseViewModel()) }
@@ -73,7 +75,8 @@ fun GroupBrowseScreen(snackBarHostState: SnackbarHostState, onAssign: (Group) ->
         viewModel = viewModel,
         snackBarHostState = snackBarHostState,
         coroutineScope = scope,
-        onAssign = onAssign
+        onAssign = onAssign,
+        onBrowseStudents = onBrowseStudents
     )
 }
 
@@ -83,7 +86,8 @@ fun GroupBrowseScreenContent(
     viewModel: GroupBrowseViewModel,
     snackBarHostState : SnackbarHostState,
     coroutineScope : CoroutineScope,
-    onAssign: (Group) -> Unit
+    onAssign: (Group) -> Unit,
+    onBrowseStudents: (Group) -> Unit
 ) {
     Box {
         if (uiState.value.isLoading) {
@@ -129,7 +133,8 @@ fun GroupBrowseScreenContent(
                             }
                         }
                     },
-                    onAssign = onAssign
+                    onAssign = onAssign,
+                    onBrowseStudents = onBrowseStudents
                 )
                 Spacer(Modifier.height(15.dp))
             }
@@ -157,7 +162,8 @@ fun GroupCard(
     onNameChange : (String) -> Unit,
     onSave: suspend (Group) -> Unit,
     onDelete: suspend (Group) -> Unit,
-    onAssign: (Group) -> Unit
+    onAssign: (Group) -> Unit,
+    onBrowseStudents: (Group) -> Unit
 ) {
     var editMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -185,6 +191,9 @@ fun GroupCard(
         },
         onAssignClick = {
             onAssign(item)
+        },
+        onBrowseStudentsClick = {
+            onBrowseStudents(item)
         }
     )
 }
@@ -198,7 +207,8 @@ fun GroupCardContent(
     onEditModeSwitch : () -> Unit,
     onNameChange: (String) -> Unit,
     onDeleteClick: () -> Unit,
-    onAssignClick: () -> Unit
+    onAssignClick: () -> Unit,
+    onBrowseStudentsClick: () -> Unit
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -251,9 +261,13 @@ fun GroupCardContent(
                         Text(text = "Удалить")
                     }
                     OutlinedButton(onClick = onAssignClick) {
-                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
+                        Icon(imageVector = Icons.Filled.DateRange, contentDescription = "assign")
                         Text(text = "Назначить работу")
                     }
+                }
+                OutlinedButton(onClick = onBrowseStudentsClick) {
+                    Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "students")
+                    Text(text = "Студенты")
                 }
             }
         }

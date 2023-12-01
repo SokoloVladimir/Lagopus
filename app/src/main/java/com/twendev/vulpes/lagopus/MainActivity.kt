@@ -41,6 +41,7 @@ import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupAssignWorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.StudentBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.edit.WorkAlterScreen
@@ -195,9 +196,15 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.GroupBrowseScreen.route
                                     ) {
-                                        GroupBrowseScreen(snackbarHostState) {
-                                            navController.navigate(Screen.GroupAssignWorkBrowse.createWithId(it.id))
-                                        }
+                                        GroupBrowseScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            onAssign = {
+                                                navController.navigate(Screen.GroupAssignWorkBrowse.createWithId(it.id))
+                                            },
+                                            onBrowseStudents = {
+                                                navController.navigate(Screen.StudentBrowseScreen.createWithGroupId(it.id))
+                                            }
+                                        )
                                     }
                                     composable(
                                         route = Screen.WorkAlterScreen.route + "?id={id}",
@@ -213,6 +220,23 @@ class MainActivity : ComponentActivity() {
                                                 navController.navigateUp()
                                             },
                                             workId = it.arguments?.getInt("id") ?: -1
+                                        )
+                                    }
+                                    composable(
+                                        route = Screen.StudentBrowseScreen.route + "?groupId={groupId}",
+                                        arguments = listOf(
+                                            navArgument("groupId") {
+                                                type = NavType.IntType
+                                            }
+                                        )
+                                    ) { navStackEntry ->
+                                        val groupId = navStackEntry.arguments?.getInt("groupId")
+                                        StudentBrowseScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            groupId = groupId!!,
+                                            onItemClick = {
+
+                                            }
                                         )
                                     }
                                 }

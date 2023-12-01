@@ -61,7 +61,13 @@ interface ZerdaApi {
     suspend fun deleteSemester(@Path("id") id: Int)
 
     @GET("/Student")
-    suspend fun getStudents() : Array<Student>
+    suspend fun getStudents(@Query("groupId") groupId: Int? = null) : Array<Student>
+    @POST("/Student")
+    suspend fun postStudent(@Body item: Student) : Student
+    @PUT("/Student")
+    suspend fun putStudent(@Body item: Student)
+    @DELETE("/Student/{id}")
+    suspend fun deleteStudent(@Path("id") id: Int)
 
     @GET("/Group")
     suspend fun getGroups() : Array<Group>

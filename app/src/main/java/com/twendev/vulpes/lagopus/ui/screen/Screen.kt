@@ -1,6 +1,7 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -52,6 +53,10 @@ sealed class Screen(
         route = "groupassignworkbrowse",
         icon = Icons.Filled.ArrowDropDown
     )
+    object StudentBrowseScreen : Screen (
+        route = "studentbrowsescreen",
+        icon = Icons.Filled.AccountCircle
+    )
     object NotFound : Screen(
         route = "notfound",
         icon = Icons.Filled.Lock
@@ -62,6 +67,9 @@ sealed class Screen(
     }
     fun createWithId(id : Int) : String {
         return "$route?id=$id"
+    }
+    fun createWithGroupId(groupId: Int) : String {
+        return "$route?groupId=$groupId"
     }
     override fun toString(): String {
         return route
