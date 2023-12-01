@@ -40,6 +40,7 @@ import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupAssignWorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.ResultBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.StudentBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
@@ -169,9 +170,9 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
                                     composable(
-                                        route = Screen.GroupAssignWorkBrowse.route + "?id={id}",
+                                        route = Screen.GroupAssignWorkBrowse.route + "?groupId={groupId}",
                                         arguments = listOf(
-                                            navArgument("id") {
+                                            navArgument("groupId") {
                                                 nullable = false
                                                 type = NavType.IntType
                                             }
@@ -180,11 +181,31 @@ class MainActivity : ComponentActivity() {
                                         GroupAssignWorkBrowseScreen(
                                             snackBarHostState = snackbarHostState,
                                             onItemClick = { workId ->
-                                                val groupId = navStackEntry.arguments?.getInt("id")
+                                                val groupId = navStackEntry.arguments?.getInt("groupId")
                                                 scope.launch {
                                                     Repositories.assignment.update(Assignment(groupId = groupId!!, workId = workId))
                                                     navController.navigateUp()
                                                 }
+                                            }
+                                        )
+                                    }
+                                    composable(
+                                        route = Screen.GroupResultsWorkBrowse.route + "?groupId={groupId}",
+                                        arguments = listOf(
+                                            navArgument("groupId") {
+                                                nullable = false
+                                                type = NavType.IntType
+                                            }
+                                        )
+                                    ) {navStackEntry ->
+                                        WorkBrowseScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            onItemClick = { workId ->
+                                                val groupId = navStackEntry.arguments?.getInt("groupId")
+                                                navController.navigate(
+                                                    Screen.ResultBrowseScreen.route +
+                                                        "?groupId=$groupId&workId=$workId"
+                                                )
                                             }
                                         )
                                     }
@@ -199,10 +220,13 @@ class MainActivity : ComponentActivity() {
                                         GroupBrowseScreen(
                                             snackBarHostState = snackbarHostState,
                                             onAssign = {
-                                                navController.navigate(Screen.GroupAssignWorkBrowse.createWithId(it.id))
+                                                navController.navigate(Screen.GroupAssignWorkBrowse.createWithGroupId(it.id))
                                             },
                                             onBrowseStudents = {
                                                 navController.navigate(Screen.StudentBrowseScreen.createWithGroupId(it.id))
+                                            },
+                                            onBrowseWorkResults = {
+                                                navController.navigate(Screen.GroupResultsWorkBrowse.createWithGroupId(it.id))
                                             }
                                         )
                                     }
@@ -237,6 +261,25 @@ class MainActivity : ComponentActivity() {
                                             onItemClick = {
 
                                             }
+                                        )
+                                    }
+                                    composable(
+                                        route = Screen.ResultBrowseScreen.route + "?groupId={groupId}&workId={workId}",
+                                        arguments = listOf(
+                                            navArgument("groupId") {
+                                                type = NavType.IntType
+                                            },
+                                            navArgument("workId") {
+                                                type = NavType.IntType
+                                            }
+                                        )
+                                    ) { navStackEntry ->
+                                        val groupId = navStackEntry.arguments?.getInt("groupId")
+                                        val workId = navStackEntry.arguments?.getInt("workId")
+                                        ResultBrowseScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            groupId = groupId!!,
+                                            workId = workId!!
                                         )
                                     }
                                 }

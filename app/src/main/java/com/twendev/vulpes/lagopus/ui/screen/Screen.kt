@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
@@ -53,9 +54,17 @@ sealed class Screen(
         route = "groupassignworkbrowse",
         icon = Icons.Filled.ArrowDropDown
     )
+    object GroupResultsWorkBrowse : Screen (
+        route = "groupresultsworkbrowse",
+        icon = Icons.Filled.ArrowDropDown
+    )
     object StudentBrowseScreen : Screen (
         route = "studentbrowsescreen",
         icon = Icons.Filled.AccountCircle
+    )
+    object ResultBrowseScreen : Screen (
+        route = "resultbrowsescreen",
+        icon = Icons.Filled.Favorite
     )
     object NotFound : Screen(
         route = "notfound",

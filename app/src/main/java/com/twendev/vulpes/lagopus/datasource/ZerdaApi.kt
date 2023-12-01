@@ -78,6 +78,19 @@ interface ZerdaApi {
     @DELETE("/Group/{id}")
     suspend fun deleteGroup(@Path("id") id: Int)
 
+    @GET("/Result")
+    suspend fun getResults(
+        @Query("studentId")   studentId: Int? = null,
+        @Query("workId")         workId: Int? = null,
+        @Query("groupId")       groupId: Int? = null
+    ) : Array<Result>
+    @POST("/Result/{studentId}/{workId}/{value}")
+    suspend fun postResult(
+        @Path("studentId")    studentId: Int,
+        @Path("workId")          workId: Int,
+        @Path("value")          value: ULong
+    )
+
     @GET("/Account")
     suspend fun getAccounts() : Array<Account>
 }
