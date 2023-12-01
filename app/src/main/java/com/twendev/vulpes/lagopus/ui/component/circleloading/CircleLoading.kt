@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -26,10 +27,11 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun CircleLoading(
-    circleColor: Color = Color(0xFF35898F),
+    circleColor: Color = MaterialTheme.colorScheme.primary,
     circleSize: Dp = 36.dp,
     animationDelay: Int = 400,
     initialAlpha: Float = 0.3f
+
 ) {
 // 3 circles
     val circles = listOf(

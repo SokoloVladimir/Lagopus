@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,21 +38,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.dropdown.OutlinedDropdown
-import com.twendev.vulpes.lagopus.ui.screen.Screen
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
 
 @Composable
-fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, onItemClick: (Int) -> Unit) {
+fun WorkBrowseScreen(onItemClick: (Work) -> Unit) {
     Log.d("WorkBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(WorkBrowseViewModel()) }
@@ -65,7 +61,6 @@ fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, onItemClick: (Int) ->
         loadingUiState = loadingUiState.value,
         uiState = uiState.value,
         viewModel = viewModel,
-        snackBarHostState = snackBarHostState,
         filterByDiscipline = {
             viewModel.filterByDiscipline(it)
         },
@@ -84,11 +79,10 @@ fun WorkBrowseScreenContent(
     loadingUiState : LoadingUiState,
     uiState: WorkBrowseUiState,
     viewModel: WorkBrowseViewModel,
-    snackBarHostState : SnackbarHostState,
     filterByDiscipline : (Discipline) -> Unit,
     filterByWorkType : (WorkType) -> Unit,
     filterBySemester : (Semester) -> Unit,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Work) -> Unit
 ) {
     Box {
         if (loadingUiState.loading != LoadingStatus.None) {
@@ -139,7 +133,7 @@ fun WorkBrowseScreenContent(
                             WorkCard(
                                 item = item,
                                 onClick = {
-                                    onItemClick(it)
+                                    onItemClick(item)
                                 }
                             )
                             Spacer(Modifier.height(15.dp))
@@ -149,7 +143,7 @@ fun WorkBrowseScreenContent(
                     item {
                         IconButton(
                             onClick = {
-                                onItemClick(0)
+                                onItemClick(Work())
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -168,7 +162,7 @@ fun WorkBrowseScreenContent(
 @Composable
 fun WorkCard(
     item : Work,
-    onClick: (Int) -> Unit
+    onClick: () -> Unit
 ) {
     WorkCardContent(
         item = item,
@@ -179,11 +173,10 @@ fun WorkCard(
 @Composable
 fun WorkCardContent(
     item: Work,
-    onClick : (Int) -> Unit
+    onClick : () -> Unit
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(
@@ -193,7 +186,7 @@ fun WorkCardContent(
                 )
             )
             .clickable {
-                onClick(item.id)
+                onClick()
             }
     ) {
         Column( Modifier.padding(15.dp)) {

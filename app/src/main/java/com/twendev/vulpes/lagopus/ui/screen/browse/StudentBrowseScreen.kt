@@ -1,11 +1,9 @@
 package com.twendev.vulpes.lagopus.ui.screen.browse
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,37 +20,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.twendev.vulpes.lagopus.model.Discipline
-import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
-import com.twendev.vulpes.lagopus.ui.component.dropdown.OutlinedDropdown
-import com.twendev.vulpes.lagopus.ui.screen.Screen
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.StudentBrowseViewModel
 
 @Composable
-fun StudentBrowseScreen(snackBarHostState: SnackbarHostState, groupId: Int, onItemClick: (Int) -> Unit) {
+fun StudentBrowseScreen(groupId: Int, onItemClick: (Int) -> Unit) {
     Log.d("StudentBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(StudentBrowseViewModel(groupId)) }
@@ -61,7 +49,6 @@ fun StudentBrowseScreen(snackBarHostState: SnackbarHostState, groupId: Int, onIt
     StudentBrowseScreenContent(
         loadingUiState = loadingUiState.value,
         viewModel = viewModel,
-        snackBarHostState = snackBarHostState,
         onItemClick = onItemClick,
     )
 }
@@ -70,7 +57,6 @@ fun StudentBrowseScreen(snackBarHostState: SnackbarHostState, groupId: Int, onIt
 fun StudentBrowseScreenContent(
     loadingUiState : LoadingUiState,
     viewModel: StudentBrowseViewModel,
-    snackBarHostState : SnackbarHostState,
     onItemClick: (Int) -> Unit
 ) {
     Box {
@@ -85,12 +71,10 @@ fun StudentBrowseScreenContent(
         }
 
         if (loadingUiState.loading != LoadingStatus.Full) {
-            var isFilterExpanded by remember { mutableStateOf(false) }
             Column {
                 LazyColumn(
                     contentPadding = PaddingValues(15.dp)
                 ) {
-
                     items(viewModel.items) { item ->
                         StudentCard(
                             item = item,
@@ -138,7 +122,6 @@ fun StudentCardContent(
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(

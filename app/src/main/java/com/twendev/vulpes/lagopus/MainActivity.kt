@@ -38,7 +38,6 @@ import com.twendev.vulpes.lagopus.model.Assignment
 import com.twendev.vulpes.lagopus.ui.repository.Repositories
 import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
-import com.twendev.vulpes.lagopus.ui.screen.browse.GroupAssignWorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.ResultBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
@@ -165,8 +164,8 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.WorkBrowseScreen.route
                                     ) {
-                                        WorkBrowseScreen(snackbarHostState) {
-                                            navController.navigate(Screen.WorkAlterScreen.createWithId(it))
+                                        WorkBrowseScreen() {
+                                            navController.navigate(Screen.WorkAlterScreen.createWithId(it.id))
                                         }
                                     }
                                     composable(
@@ -178,12 +177,11 @@ class MainActivity : ComponentActivity() {
                                             }
                                         )
                                     ) {navStackEntry ->
-                                        GroupAssignWorkBrowseScreen(
-                                            snackBarHostState = snackbarHostState,
-                                            onItemClick = { workId ->
+                                        WorkBrowseScreen(
+                                            onItemClick = { work ->
                                                 val groupId = navStackEntry.arguments?.getInt("groupId")
                                                 scope.launch {
-                                                    Repositories.assignment.update(Assignment(groupId = groupId!!, workId = workId))
+                                                    Repositories.assignment.update(Assignment(groupId = groupId!!, workId = work.id))
                                                     navController.navigateUp()
                                                 }
                                             }
@@ -199,12 +197,11 @@ class MainActivity : ComponentActivity() {
                                         )
                                     ) {navStackEntry ->
                                         WorkBrowseScreen(
-                                            snackBarHostState = snackbarHostState,
-                                            onItemClick = { workId ->
+                                            onItemClick = { work ->
                                                 val groupId = navStackEntry.arguments?.getInt("groupId")
                                                 navController.navigate(
                                                     Screen.ResultBrowseScreen.route +
-                                                        "?groupId=$groupId&workId=$workId"
+                                                        "?groupId=$groupId&workId=${work.id}"
                                                 )
                                             }
                                         )
@@ -256,10 +253,9 @@ class MainActivity : ComponentActivity() {
                                     ) { navStackEntry ->
                                         val groupId = navStackEntry.arguments?.getInt("groupId")
                                         StudentBrowseScreen(
-                                            snackBarHostState = snackbarHostState,
                                             groupId = groupId!!,
                                             onItemClick = {
-
+                                                // TODO: student alter screen
                                             }
                                         )
                                     }
@@ -277,7 +273,6 @@ class MainActivity : ComponentActivity() {
                                         val groupId = navStackEntry.arguments?.getInt("groupId")
                                         val workId = navStackEntry.arguments?.getInt("workId")
                                         ResultBrowseScreen(
-                                            snackBarHostState = snackbarHostState,
                                             groupId = groupId!!,
                                             workId = workId!!
                                         )

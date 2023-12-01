@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.model.Result
@@ -42,7 +39,7 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.ResultBrowseViewModel
 
 @Composable
-fun ResultBrowseScreen(snackBarHostState: SnackbarHostState, groupId: Int, workId: Int) {
+fun ResultBrowseScreen(groupId: Int, workId: Int) {
     Log.d("ResultBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(ResultBrowseViewModel(groupId = groupId, workId = workId)) }
@@ -51,7 +48,6 @@ fun ResultBrowseScreen(snackBarHostState: SnackbarHostState, groupId: Int, workI
     ResultBrowseScreenContent(
         loadingUiState = loadingUiState.value,
         viewModel = viewModel,
-        snackBarHostState = snackBarHostState,
         items = viewModel.items,
         work = viewModel.work
     )
@@ -61,7 +57,6 @@ fun ResultBrowseScreen(snackBarHostState: SnackbarHostState, groupId: Int, workI
 fun ResultBrowseScreenContent(
     loadingUiState : LoadingUiState,
     viewModel: ResultBrowseViewModel,
-    snackBarHostState : SnackbarHostState,
     items: List<Result>,
     work: Work?
 ) {
@@ -81,7 +76,7 @@ fun ResultBrowseScreenContent(
                 LazyColumn(
                     contentPadding = PaddingValues(15.dp)
                 ) {
-                    items(viewModel.items) { item ->
+                    items(items) { item ->
                         ResultCard(
                             item = item,
                             taskCount = work!!.taskCount,
@@ -134,7 +129,6 @@ fun ResultCardContent(
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(
