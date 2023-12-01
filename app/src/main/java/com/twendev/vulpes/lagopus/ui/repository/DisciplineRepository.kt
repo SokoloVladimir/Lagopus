@@ -5,7 +5,7 @@ import com.twendev.vulpes.lagopus.model.Discipline
 
 class DisciplineRepository : RepositoryInterface<Discipline> {
     private val zerdaSource = ZerdaService.Singleton
-    override suspend fun get(id: Int) : Discipline? {
+    suspend fun get(id: Int) : Discipline? {
         return zerdaSource.api.getDisciplines().firstOrNull { it.id == id}
     }
     override suspend fun get(): List<Discipline> {

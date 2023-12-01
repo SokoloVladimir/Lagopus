@@ -6,7 +6,7 @@ import com.twendev.vulpes.lagopus.model.Group
 class GroupRepository : RepositoryInterface<Group> {
     private val zerdaSource = ZerdaService.Singleton
 
-    override suspend fun get(id: Int) : Group? {
+    suspend fun get(id: Int) : Group? {
         return zerdaSource.api.getGroups().firstOrNull { it.id == id}
     }
     override suspend fun get(): List<Group> {

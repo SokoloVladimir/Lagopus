@@ -7,5 +7,6 @@ sealed class Repositories {
         val work : WorkRepository = WorkRepository()
         val semester : SemesterRepository = SemesterRepository()
         val group : GroupRepository = GroupRepository()
+        val assignment : AssignmentRepository = AssignmentRepository()
     }
 }

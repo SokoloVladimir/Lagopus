@@ -5,7 +5,7 @@ import com.twendev.vulpes.lagopus.model.Semester
 
 class SemesterRepository : RepositoryInterface<Semester> {
     private val zerdaSource = ZerdaService.Singleton
-    override suspend fun get(id: Int) : Semester? {
+    suspend fun get(id: Int) : Semester? {
         return zerdaSource.api.getSemesters().firstOrNull { it.id == id}
     }
     override suspend fun get(): List<Semester> {

@@ -6,7 +6,7 @@ import com.twendev.vulpes.lagopus.model.WorkType
 class WorkTypeRepository : RepositoryInterface<WorkType> {
     private val zerdaSource = ZerdaService.Singleton
 
-    override suspend fun get(id: Int) : WorkType? {
+    suspend fun get(id: Int) : WorkType? {
         return zerdaSource.api.getWorkTypes().firstOrNull { it.id == id}
     }
     override suspend fun get(): List<WorkType> {
