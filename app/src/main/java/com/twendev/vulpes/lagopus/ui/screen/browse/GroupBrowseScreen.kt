@@ -32,6 +32,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarDuration
@@ -60,7 +61,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun GroupBrowseScreen(snackBarHostState: SnackbarHostState) {
+fun GroupBrowseScreen(snackBarHostState: SnackbarHostState, onAssign: (Group) -> Unit) {
     Log.d("GroupBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(GroupBrowseViewModel()) }
@@ -71,7 +72,8 @@ fun GroupBrowseScreen(snackBarHostState: SnackbarHostState) {
         uiState = uiState,
         viewModel = viewModel,
         snackBarHostState = snackBarHostState,
-        coroutineScope = scope
+        coroutineScope = scope,
+        onAssign = onAssign
     )
 }
 
@@ -80,7 +82,8 @@ fun GroupBrowseScreenContent(
     uiState : State<LoadingUiState>,
     viewModel: GroupBrowseViewModel,
     snackBarHostState : SnackbarHostState,
-    coroutineScope : CoroutineScope
+    coroutineScope : CoroutineScope,
+    onAssign: (Group) -> Unit
 ) {
     Box {
         if (uiState.value.isLoading) {
@@ -125,7 +128,8 @@ fun GroupBrowseScreenContent(
                                 }
                             }
                         }
-                    }
+                    },
+                    onAssign = onAssign
                 )
                 Spacer(Modifier.height(15.dp))
             }
@@ -152,7 +156,8 @@ fun GroupCard(
     item : Group,
     onNameChange : (String) -> Unit,
     onSave: suspend (Group) -> Unit,
-    onDelete: suspend (Group) -> Unit
+    onDelete: suspend (Group) -> Unit,
+    onAssign: (Group) -> Unit
 ) {
     var editMode by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
@@ -177,6 +182,9 @@ fun GroupCard(
             scope.launch {
                 onDelete(item)
             }
+        },
+        onAssignClick = {
+            onAssign(item)
         }
     )
 }
@@ -189,7 +197,8 @@ fun GroupCardContent(
     isEditMode : Boolean,
     onEditModeSwitch : () -> Unit,
     onNameChange: (String) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onAssignClick: () -> Unit
 ) {
     OutlinedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -236,8 +245,15 @@ fun GroupCardContent(
                     keyboardActions = KeyboardActions(onDone = { onEditModeSwitch() }),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
-                IconButton(onClick = onDeleteClick) {
-                    Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
+                Row {
+                    OutlinedButton(onClick = onDeleteClick) {
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
+                        Text(text = "Удалить")
+                    }
+                    OutlinedButton(onClick = onAssignClick) {
+                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
+                        Text(text = "Назначить работу")
+                    }
                 }
             }
         }

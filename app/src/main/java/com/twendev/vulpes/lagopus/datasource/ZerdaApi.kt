@@ -11,6 +11,15 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ZerdaApi {
+    @GET("/Assignment")
+    suspend fun getAssignments() : Array<Assignment>
+    @POST("/Assignment")
+    suspend fun postAssignment(@Body item: Assignment) : Assignment
+    @PUT("/Assignment")
+    suspend fun putAssignment(@Body item: Assignment)
+    @DELETE("/Assignment/{workId}/{groupId}")
+    suspend fun deleteAssignment(@Path("workId") workId: Int, @Path("groupId") groupId: Int)
+
     @GET("/Work")
     suspend fun getWorks(
         @Query("disciplineId")  disciplineId : Int? = null,

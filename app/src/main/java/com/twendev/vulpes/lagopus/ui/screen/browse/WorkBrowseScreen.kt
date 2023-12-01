@@ -54,7 +54,7 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
 
 @Composable
-fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, navController : NavController) {
+fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, onItemClick: (Int) -> Unit) {
     Log.d("WorkBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(WorkBrowseViewModel()) }
@@ -75,9 +75,7 @@ fun WorkBrowseScreen(snackBarHostState: SnackbarHostState, navController : NavCo
         filterBySemester = {
             viewModel.filterBySemester(it)
         },
-        navToWorkById = {
-            navController.navigate(Screen.WorkAlterScreen.createWithId(it))
-        },
+        onItemClick = onItemClick,
     )
 }
 
@@ -90,7 +88,7 @@ fun WorkBrowseScreenContent(
     filterByDiscipline : (Discipline) -> Unit,
     filterByWorkType : (WorkType) -> Unit,
     filterBySemester : (Semester) -> Unit,
-    navToWorkById: (Int) -> Unit
+    onItemClick: (Int) -> Unit
 ) {
     Box {
         if (loadingUiState.loading != LoadingStatus.None) {
@@ -141,7 +139,7 @@ fun WorkBrowseScreenContent(
                             WorkCard(
                                 item = item,
                                 onClick = {
-                                    navToWorkById(it)
+                                    onItemClick(it)
                                 }
                             )
                             Spacer(Modifier.height(15.dp))
@@ -151,7 +149,7 @@ fun WorkBrowseScreenContent(
                     item {
                         IconButton(
                             onClick = {
-                                navToWorkById(0)
+                                onItemClick(0)
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {

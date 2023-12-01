@@ -34,8 +34,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
+import com.twendev.vulpes.lagopus.model.Assignment
+import com.twendev.vulpes.lagopus.ui.repository.Repositories
 import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
+import com.twendev.vulpes.lagopus.ui.screen.browse.GroupAssignWorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
@@ -160,7 +163,29 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.WorkBrowseScreen.route
                                     ) {
-                                        WorkBrowseScreen(snackbarHostState, navController)
+                                        WorkBrowseScreen(snackbarHostState) {
+                                            navController.navigate(Screen.WorkAlterScreen.createWithId(it))
+                                        }
+                                    }
+                                    composable(
+                                        route = Screen.GroupAssignWorkBrowse.route + "?id={id}",
+                                        arguments = listOf(
+                                            navArgument("id") {
+                                                nullable = false
+                                                type = NavType.IntType
+                                            }
+                                        )
+                                    ) {navStackEntry ->
+                                        GroupAssignWorkBrowseScreen(
+                                            snackBarHostState = snackbarHostState,
+                                            onItemClick = { workId ->
+                                                val groupId = navStackEntry.arguments?.getInt("id")
+                                                scope.launch {
+                                                    Repositories.assignment.update(Assignment(groupId = groupId!!, workId = workId))
+                                                    navController.navigateUp()
+                                                }
+                                            }
+                                        )
                                     }
                                     composable(
                                         route = Screen.SemesterBrowseScreen.route
@@ -170,7 +195,9 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.GroupBrowseScreen.route
                                     ) {
-                                        GroupBrowseScreen(snackbarHostState)
+                                        GroupBrowseScreen(snackbarHostState) {
+                                            navController.navigate(Screen.GroupAssignWorkBrowse.createWithId(it.id))
+                                        }
                                     }
                                     composable(
                                         route = Screen.WorkAlterScreen.route + "?id={id}",
