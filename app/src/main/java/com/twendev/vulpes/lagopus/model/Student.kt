@@ -14,6 +14,6 @@ data class Student (
     @SerializedName("group"     ) val group     : Group
 ) {
     override fun toString(): String {
-        return "${name.first()}. $surname"
+        return "$surname ${name.first()}."
     }
 }
