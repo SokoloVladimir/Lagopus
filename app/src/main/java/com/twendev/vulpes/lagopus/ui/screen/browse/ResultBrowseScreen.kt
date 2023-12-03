@@ -28,12 +28,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Result
+import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.ui.component.checkbox.InternalCheckBox
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
+import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.ResultBrowseViewModel
@@ -104,16 +109,21 @@ fun ResultCard(
     onSave: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    var tasksBeforeEditing by remember { mutableStateOf(item.tasks) }
 
     ResultCardContent(
         item = item,
-        setTaskState = setTaskState,
         taskCount = taskCount,
         isExpanded = isExpanded,
+        isEdited = item.tasks != tasksBeforeEditing,
+        setTaskState = setTaskState,
         onChangeExpanded = {
             isExpanded = !isExpanded
-            if (!isExpanded) {
+            if (!isExpanded && item.tasks != tasksBeforeEditing) {
                 onSave()
+                tasksBeforeEditing = item.tasks
+            } else if (isExpanded) {
+                tasksBeforeEditing = item.tasks
             }
         }
     )
@@ -122,9 +132,10 @@ fun ResultCard(
 @Composable
 fun ResultCardContent(
     item: Result,
-    setTaskState: (Int, Boolean) -> Unit,
     taskCount: Int,
     isExpanded: Boolean,
+    isEdited : Boolean,
+    setTaskState: (Int, Boolean) -> Unit,
     onChangeExpanded: () -> Unit,
 ) {
     OutlinedCard(
@@ -142,10 +153,11 @@ fun ResultCardContent(
             }
     ) {
         Column(
-            Modifier.padding(9.dp)
+            Modifier.padding(8.dp)
         ) {
             Text(
                 text = item.cachedStudent.toString(),
+                fontStyle = if (isEdited) FontStyle.Italic else null,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )
@@ -157,7 +169,7 @@ fun ResultCardContent(
                         modifier = Modifier.padding(5.dp)
                     ) {
                         InternalCheckBox(
-                            value = " " + (index + 1).toString() + " ",
+                            value = (index + 1).toString(),
                             checked = item.getTaskState(index),
                             onCheckedChange = {
                                 setTaskState(index, it)
@@ -165,18 +177,33 @@ fun ResultCardContent(
                             enabled = isExpanded
                         )
                     }
-
-
-                    /*Text(text = (index + 1).toString())
-                    Checkbox(
-                        enabled = isExpanded,
-                        checked = item.getTaskState(index),
-                        onCheckedChange = {
-                            setTaskState(index, it)
-                        }
-                    )*/
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun ResultCardContentPreview() {
+    LagopusTheme {
+        ResultCardContent(
+            item = Result(
+                studentId = 0,
+                workId = 0,
+                tasks = 4uL,
+                cachedStudent = Student(
+                    surname = "Surname",
+                    name = "Name",
+                    group = Group(),
+                    groupId = 0
+                )
+            ),
+            taskCount = 7,
+            isExpanded = true,
+            isEdited = true,
+            setTaskState = { i, b -> },
+            onChangeExpanded = { }
+        )
     }
 }
