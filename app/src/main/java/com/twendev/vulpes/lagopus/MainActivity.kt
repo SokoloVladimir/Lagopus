@@ -20,13 +20,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,8 +39,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
-import com.twendev.vulpes.lagopus.model.Assignment
-import com.twendev.vulpes.lagopus.ui.repository.Repositories
 import com.twendev.vulpes.lagopus.ui.screen.*
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
@@ -44,7 +47,7 @@ import com.twendev.vulpes.lagopus.ui.screen.browse.SemesterBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.StudentBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.WorkTypeBrowseScreen
-import com.twendev.vulpes.lagopus.ui.screen.edit.WorkAlterScreen
+import com.twendev.vulpes.lagopus.ui.screen.edit.*
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -66,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             snackbarHostState.showSnackbar(message = text, duration = SnackbarDuration.Short)
                         }
                     }
-                    val navController = rememberNavController()
+                    val navManager = rememberNavManager()
                     val screens = listOf(
                         Screen.MainScreen,
                         Screen.DisciplineBrowseScreen,
@@ -75,7 +78,7 @@ class MainActivity : ComponentActivity() {
                         Screen.SemesterBrowseScreen,
                         Screen.GroupBrowseScreen
                     )
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val navBackStackEntry by navManager.collectNavStackEntryAsState()
                     var topAppBar : (@Composable () -> Unit) by remember { mutableStateOf({ }) }
                     val changeTopAppBar : (@Composable () -> Unit) -> Unit = { compose ->
                         topAppBar = compose
@@ -103,8 +106,8 @@ class MainActivity : ComponentActivity() {
                                                 label = { Text(screen.route) },
                                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                                 onClick = {
-                                                    navController.navigate(screen.route) {
-                                                        popUpTo(navController.graph.startDestinationId) {
+                                                    navManager.navTo(screen.route) {
+                                                        popUpTo(navManager.navController.graph.startDestinationId) {
                                                             saveState = true
                                                         }
                                                         launchSingleTop = true
@@ -120,7 +123,7 @@ class MainActivity : ComponentActivity() {
                             Box(
                                 Modifier.padding(innerPadding)
                             ) {
-                                NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
+                                NavHost(navController = navManager.navController, startDestination = Screen.AuthScreen.route) {
                                     composable(
                                         route = Screen.AuthScreen.route
                                     ) {
@@ -130,9 +133,8 @@ class MainActivity : ComponentActivity() {
                                                     throw IllegalArgumentException("wrong URL")
                                                 }
 
-                                                Log.d("MA", Screen.MainScreen.createWithInstance(url))
                                                 ZerdaService.Singleton = ZerdaService(url)
-                                                navController.navigate(Screen.MainScreen.createWithInstance(url))
+                                                navManager.navTo(Screen.MainScreen.route)
                                                 true
                                             } catch (ex : Exception) {
                                                 Log.d("MA:ex", ex.message ?: "empty")
@@ -142,12 +144,6 @@ class MainActivity : ComponentActivity() {
                                     }
                                     composable(
                                         route = Screen.MainScreen.route
-                                    ) {
-                                        MainScreen()
-                                    }
-                                    composable(
-                                        route = Screen.MainScreen.createWithInstance("{url}"),
-                                        arguments = listOf(navArgument(name = "url") { type = NavType.StringType })
                                     ) {
                                         MainScreen()
                                     }
@@ -164,31 +160,29 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.WorkBrowseScreen.route
                                     ) {
-                                        WorkBrowseScreen() {
-                                            navController.navigate(Screen.WorkAlterScreen.createWithId(it.id))
+                                        WorkBrowseScreen {
+                                            navManager.navTo(Screen.WorkAlterScreen.createWithId(it.id))
                                         }
                                     }
                                     composable(
-                                        route = Screen.GroupAssignWorkBrowse.route + "?groupId={groupId}",
+                                        route = Screen.GroupAssignWorkBrowse.withGroupId(),
                                         arguments = listOf(
                                             navArgument("groupId") {
                                                 nullable = false
                                                 type = NavType.IntType
                                             }
                                         )
-                                    ) {navStackEntry ->
+                                    ) { navStackEntry ->
+                                        val groupId = navStackEntry.arguments?.getInt("groupId")
+
                                         WorkBrowseScreen(
                                             onItemClick = { work ->
-                                                val groupId = navStackEntry.arguments?.getInt("groupId")
-                                                scope.launch {
-                                                    Repositories.assignment.update(Assignment(groupId = groupId!!, workId = work.id))
-                                                    navController.navigateUp()
-                                                }
+                                                navManager.navTo(Screen.AssignmentAlterScreen.createWithGroupIdAndWorkid(groupId!!, work.id))
                                             }
                                         )
                                     }
                                     composable(
-                                        route = Screen.GroupResultsWorkBrowse.route + "?groupId={groupId}",
+                                        route = Screen.GroupResultsWorkBrowse.withGroupId(),
                                         arguments = listOf(
                                             navArgument("groupId") {
                                                 nullable = false
@@ -196,12 +190,15 @@ class MainActivity : ComponentActivity() {
                                             }
                                         )
                                     ) {navStackEntry ->
+                                        val groupId = navStackEntry.arguments?.getInt("groupId")
+
                                         WorkBrowseScreen(
                                             onItemClick = { work ->
-                                                val groupId = navStackEntry.arguments?.getInt("groupId")
-                                                navController.navigate(
-                                                    Screen.ResultBrowseScreen.route +
-                                                        "?groupId=$groupId&workId=${work.id}"
+                                                navManager.navTo(
+                                                    Screen.ResultBrowseScreen.createWithGroupIdAndWorkid(
+                                                        groupId = groupId!!,
+                                                        workId = work.id
+                                                    )
                                                 )
                                             }
                                         )
@@ -217,18 +214,18 @@ class MainActivity : ComponentActivity() {
                                         GroupBrowseScreen(
                                             snackBarHostState = snackbarHostState,
                                             onAssign = {
-                                                navController.navigate(Screen.GroupAssignWorkBrowse.createWithGroupId(it.id))
+                                                navManager.navTo(Screen.GroupAssignWorkBrowse.createWithGroupId(it.id))
                                             },
                                             onBrowseStudents = {
-                                                navController.navigate(Screen.StudentBrowseScreen.createWithGroupId(it.id))
+                                                navManager.navTo(Screen.StudentBrowseScreen.createWithGroupId(it.id))
                                             },
                                             onBrowseWorkResults = {
-                                                navController.navigate(Screen.GroupResultsWorkBrowse.createWithGroupId(it.id))
+                                                navManager.navTo(Screen.GroupResultsWorkBrowse.createWithGroupId(it.id))
                                             }
                                         )
                                     }
                                     composable(
-                                        route = Screen.WorkAlterScreen.route + "?id={id}",
+                                        route = Screen.WorkAlterScreen.withId(),
                                         arguments = listOf(
                                             navArgument("id") {
                                                 type = NavType.IntType
@@ -238,13 +235,13 @@ class MainActivity : ComponentActivity() {
                                         WorkAlterScreen(
                                             snackBarHostState = snackbarHostState,
                                             navigateBack = {
-                                                navController.navigateUp()
+                                                navManager.navUp()
                                             },
                                             workId = it.arguments?.getInt("id") ?: -1
                                         )
                                     }
                                     composable(
-                                        route = Screen.StudentBrowseScreen.route + "?groupId={groupId}",
+                                        route = Screen.StudentBrowseScreen.withGroupId(),
                                         arguments = listOf(
                                             navArgument("groupId") {
                                                 type = NavType.IntType
@@ -260,21 +257,21 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                     composable(
-                                        route = Screen.ResultBrowseScreen.route + "?groupId={groupId}&workId={workId}",
+                                        route = Screen.ResultBrowseScreen.withGroupIdAndWorkId(),
                                         arguments = listOf(
-                                            navArgument("groupId") {
+                                            navArgument("workId") {
                                                 type = NavType.IntType
                                             },
-                                            navArgument("workId") {
+                                            navArgument("groupId") {
                                                 type = NavType.IntType
                                             }
                                         )
                                     ) { navStackEntry ->
-                                        val groupId = navStackEntry.arguments?.getInt("groupId")
                                         val workId = navStackEntry.arguments?.getInt("workId")
+                                        val groupId = navStackEntry.arguments?.getInt("groupId")
                                         ResultBrowseScreen(
-                                            groupId = groupId!!,
-                                            workId = workId!!
+                                            workId = workId!!,
+                                            groupId = groupId!!
                                         )
                                     }
                                 }
@@ -284,5 +281,29 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Stable
+class NavigationManager(val navController : NavHostController) {
+    fun navTo(route: String, navOptionsBuilder: NavOptionsBuilder.() -> Unit) = navController.navigate(route, navOptionsBuilder)
+    fun navTo(route: String) {
+        navController.navigate(route)
+    }
+
+    fun navUp() {
+        navController.navigateUp()
+    }
+
+    @Composable
+    fun collectNavStackEntryAsState() : State<NavBackStackEntry?> {
+        return navController.currentBackStackEntryAsState()
+    }
+}
+
+@Composable
+fun rememberNavManager(navController: NavHostController = rememberNavController()) : NavigationManager {
+    return remember(Unit) {
+        NavigationManager(navController = navController)
     }
 }

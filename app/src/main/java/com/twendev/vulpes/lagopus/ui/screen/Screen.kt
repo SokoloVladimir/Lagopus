@@ -18,6 +18,26 @@ sealed class Screen(
     val route: String,
     val icon: ImageVector
 ) {
+    sealed class Groupable(route: String, icon: ImageVector) : Screen(route, icon) {
+        fun withGroupId(): String {
+            return "$route?groupId={groupId}"
+        }
+
+        fun createWithGroupId(groupId: Int): String {
+            return "$route?groupId=$groupId"
+        }
+    }
+
+    sealed class WorkableGroupable(route: String, icon: ImageVector) : Screen(route, icon) {
+        fun withGroupIdAndWorkId(): String {
+            return "$route?groupId={groupId}&workId={workId}"
+        }
+
+        fun createWithGroupIdAndWorkid(groupId: Int, workId: Int): String {
+            return "$route?groupId=$groupId&workId=$workId"
+        }
+    }
+
     object MainScreen : Screen(
         route = "main",
         icon = Icons.Filled.Home
@@ -50,19 +70,19 @@ sealed class Screen(
         route = "groupbrowse",
         icon = Icons.Filled.ArrowBack
     )
-    object GroupAssignWorkBrowse : Screen (
+    object GroupAssignWorkBrowse : Screen.Groupable (
         route = "groupassignworkbrowse",
         icon = Icons.Filled.ArrowDropDown
     )
-    object GroupResultsWorkBrowse : Screen (
+    object GroupResultsWorkBrowse : Screen.Groupable (
         route = "groupresultsworkbrowse",
         icon = Icons.Filled.ArrowDropDown
     )
-    object StudentBrowseScreen : Screen (
+    object StudentBrowseScreen : Screen.Groupable (
         route = "studentbrowsescreen",
         icon = Icons.Filled.AccountCircle
     )
-    object ResultBrowseScreen : Screen (
+    object ResultBrowseScreen : Screen.WorkableGroupable (
         route = "resultbrowsescreen",
         icon = Icons.Filled.Favorite
     )
@@ -71,15 +91,13 @@ sealed class Screen(
         icon = Icons.Filled.Lock
     )
 
-    fun createWithInstance(url : String?) : String {
-        return "$route?instance=$url"
+    fun withId() : String {
+        return "$route?id={id}"
     }
     fun createWithId(id : Int) : String {
         return "$route?id=$id"
     }
-    fun createWithGroupId(groupId: Int) : String {
-        return "$route?groupId=$groupId"
-    }
+
     override fun toString(): String {
         return route
     }
