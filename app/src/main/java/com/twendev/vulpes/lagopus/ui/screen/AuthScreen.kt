@@ -2,7 +2,6 @@ package com.twendev.vulpes.lagopus.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,10 +30,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun AuthScreen(
     navigateToMainScreen : suspend (instance: String) -> Boolean,
-    showMessage : (message: String) -> Unit
+    showMessage : suspend (message: String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-
     val focusManager = LocalFocusManager.current
 
     var loadingStatus by remember { mutableStateOf(false) }
