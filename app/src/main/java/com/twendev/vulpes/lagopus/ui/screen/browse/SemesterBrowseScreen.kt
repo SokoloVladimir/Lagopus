@@ -48,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.chargemap.compose.numberpicker.NumberPicker
 import com.twendev.vulpes.lagopus.model.Semester
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.SemesterBrowseViewModel
@@ -56,8 +58,17 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
-fun SemesterBrowseScreen(snackBarHostState: SnackbarHostState) {
+fun SemesterBrowseScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
+    snackBarHostState: SnackbarHostState
+) {
     Log.d("SemesterBrowseScreen",  "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            title = "SemesterBrowse",
+            navManager = it
+        )
+    }
 
     val viewModel by remember { mutableStateOf(SemesterBrowseViewModel()) }
     val uiState = viewModel.loadingUiState.collectAsState()

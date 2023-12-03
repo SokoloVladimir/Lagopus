@@ -22,6 +22,8 @@ import com.twendev.vulpes.lagopus.model.Assignment
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import com.twendev.vulpes.lagopus.ui.viewmodel.AssignmentAlterUiState
@@ -31,11 +33,18 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 
 @Composable
 fun AssignmentAlterScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
     workId: Int,
     groupId: Int,
     onConfirm: () -> Unit
 ) {
     Log.d("AssignemtnAlterScreen", "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            title = "AssignmentAlter",
+            navManager = it
+        )
+    }
 
     val viewModel by remember { mutableStateOf(
         AssignmentAlterViewModel(

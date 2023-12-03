@@ -39,10 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.twendev.vulpes.lagopus.R
 import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.dropdown.OutlinedDropdown
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
@@ -51,8 +54,17 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
 
 @Composable
-fun WorkBrowseScreen(onItemClick: (Work) -> Unit) {
+fun WorkBrowseScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
+    onItemClick: (Work) -> Unit
+) {
     Log.d("WorkBrowseScreen",  "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            titleRes = R.string.screen_workbrowse_process,
+            navManager = it
+        )
+    }
 
     val viewModel by remember { mutableStateOf(WorkBrowseViewModel(onItemClick)) }
 

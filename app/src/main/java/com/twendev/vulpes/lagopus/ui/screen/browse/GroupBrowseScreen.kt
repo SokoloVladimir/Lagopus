@@ -57,6 +57,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.model.Group
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.GroupBrowseViewModel
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
@@ -64,12 +66,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GroupBrowseScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
     snackBarHostState: SnackbarHostState,
     onAssign: (Group) -> Unit,
     onBrowseStudents: (Group) -> Unit,
     onBrowseWorkResults: (Group) -> Unit
 ) {
     Log.d("GroupBrowseScreen",  "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            title = "GroupBrowse",
+            navManager = it
+        )
+    }
 
     val viewModel by remember { mutableStateOf(GroupBrowseViewModel()) }
     val scope = rememberCoroutineScope()

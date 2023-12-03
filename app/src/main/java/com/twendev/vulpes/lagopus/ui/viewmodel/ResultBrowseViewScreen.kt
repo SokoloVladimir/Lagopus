@@ -1,9 +1,10 @@
 package com.twendev.vulpes.lagopus.ui.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
+import com.twendev.vulpes.lagopus.model.Group
+import com.twendev.vulpes.lagopus.model.Result
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.ui.repository.Repositories
-import com.twendev.vulpes.lagopus.model.Result as Result
 import com.twendev.vulpes.lagopus.ui.repository.ResultRepository
 
 
@@ -15,10 +16,12 @@ class ResultBrowseViewModel(
 
     val items = mutableStateListOf<Result>()
     var work : Work? = null
+    var group : Group? = null
 
     init {
         suspendAction {
             work = Repositories.work.get(workId)
+            group = Repositories.group.get(groupId)
         }
         suspendActionWithLoading {
             refreshAsync()

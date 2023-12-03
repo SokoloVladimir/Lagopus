@@ -1,5 +1,6 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,16 +16,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.twendev.vulpes.lagopus.R
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.model.Work
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
 
 @Composable
-fun MainScreen()
-{
+fun MainScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
+) {
+    Log.d("MainScreen", "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            titleRes = R.string.screen_main_process,
+            navManager = it
+        )
+    }
+
     var loadingStatus by remember { mutableStateOf(false) }
     val zerda = ZerdaService.Singleton
     var works by remember { mutableStateOf<List<Work>>(listOf()) }

@@ -34,14 +34,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.model.Student
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.StudentBrowseViewModel
 
 @Composable
-fun StudentBrowseScreen(groupId: Int, onItemClick: (Int) -> Unit) {
+fun StudentBrowseScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
+    groupId: Int,
+    onItemClick: (Int) -> Unit
+) {
     Log.d("StudentBrowseScreen",  "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            title = "StudentBrowse",
+            navManager = it
+        )
+    }
 
     val viewModel by remember { mutableStateOf(StudentBrowseViewModel(groupId)) }
     val loadingUiState = viewModel.loadingUiState.collectAsState()

@@ -36,21 +36,29 @@ import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Result
 import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.model.Work
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.checkbox.InternalCheckBox
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
+import com.twendev.vulpes.lagopus.ui.screen.Screen
 import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.ResultBrowseViewModel
 
 @Composable
-fun ResultBrowseScreen(groupId: Int, workId: Int) {
+fun ResultBrowseScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
+    groupId: Int,
+    workId: Int
+) {
     Log.d("ResultBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(ResultBrowseViewModel(groupId = groupId, workId = workId)) }
     val loadingUiState = viewModel.loadingUiState.collectAsState()
 
     ResultBrowseScreenContent(
+        setTopAppBar = setTopAppBar,
         loadingUiState = loadingUiState.value,
         viewModel = viewModel,
         items = viewModel.items,
@@ -60,6 +68,7 @@ fun ResultBrowseScreen(groupId: Int, workId: Int) {
 
 @Composable
 fun ResultBrowseScreenContent(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
     loadingUiState : LoadingUiState,
     viewModel: ResultBrowseViewModel,
     items: List<Result>,
@@ -77,6 +86,16 @@ fun ResultBrowseScreenContent(
         }
 
         if (loadingUiState.loading != LoadingStatus.Full) {
+            setTopAppBar {
+                TopAppBarElement(
+                    title = "Работа ${work?.workType?.getShortName() + work?.number} у ${viewModel.group}",
+                    navManager = it,
+                    dropdownMap = mapOf(
+                        "Редактировать работу" to { it.navTo(Screen.WorkAlterScreen.createWithId(viewModel.work?.id!!)) }
+                    )
+                )
+            }
+
             Column {
                 LazyColumn(
                     contentPadding = PaddingValues(15.dp)

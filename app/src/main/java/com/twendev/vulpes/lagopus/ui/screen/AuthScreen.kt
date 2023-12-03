@@ -1,5 +1,6 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.twendev.vulpes.lagopus.R
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
@@ -29,9 +33,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AuthScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
     navigateToMainScreen : suspend (instance: String) -> Boolean,
     showMessage : suspend (message: String) -> Unit
 ) {
+    Log.d("AuthScreen", "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            titleRes = R.string.screen_auth_process,
+            navManager = it,
+            isBackable = false
+        )
+    }
+
+    // TODO: прибраться в AuthScreen, унести в AuthViewModel
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
@@ -66,7 +81,6 @@ fun AuthScreen(
             focusManager.moveFocus(FocusDirection.Down)
         },
         onPasswordKeyBoardAction = tryToConnect
-
     )
 }
 

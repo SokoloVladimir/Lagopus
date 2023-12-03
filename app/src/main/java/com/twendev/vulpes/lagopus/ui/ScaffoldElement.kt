@@ -26,11 +26,11 @@ fun ScaffoldElement(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val navBackStackEntry by navManager.collectNavStackEntryAsState()
-    var topAppBar : (@Composable () -> Unit) by remember { mutableStateOf({ }) }
+    var topAppBar : (@Composable (NavigationManager) -> Unit) by remember { mutableStateOf({ }) }
 
     ScaffoldElementContent(
         snackbarHostState = snackbarHostState,
-        topAppBar = topAppBar,
+        topAppBar = { topAppBar(navManager) },
         bottomAppBar = {
             if (navBackStackEntry?.destination?.route != Screen.AuthScreen.route) {
                 ScaffoldElementBottomBar(

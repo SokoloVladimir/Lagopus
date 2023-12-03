@@ -27,10 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.chargemap.compose.numberpicker.NumberPicker
+import com.twendev.vulpes.lagopus.R
 import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.dropdown.OutlinedDropdown
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
@@ -39,11 +42,19 @@ import kotlin.math.roundToInt
 
 @Composable
 fun WorkAlterScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
     snackBarHostState: SnackbarHostState,
     navigateBack: () -> Unit,
     workId: Int
 ) {
     Log.d("WorkAlterScreen", "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            titleRes = R.string.screen_workalter_process,
+            navManager = it
+        )
+    }
+
     val viewModel by remember { mutableStateOf(WorkAlterViewModel(workId)) }
     val loadingUiState = viewModel.loadingUiState.collectAsState()
     val uiState = viewModel.uiState.collectAsState()

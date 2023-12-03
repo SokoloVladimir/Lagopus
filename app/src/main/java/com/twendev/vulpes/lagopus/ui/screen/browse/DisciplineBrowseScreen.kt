@@ -50,7 +50,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
+import com.twendev.vulpes.lagopus.R
 import com.twendev.vulpes.lagopus.model.Discipline
+import com.twendev.vulpes.lagopus.ui.NavigationManager
+import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.DisciplineBrowseViewModel
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
@@ -58,8 +61,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun DisciplineBrowseScreen(snackBarHostState: SnackbarHostState) {
+fun DisciplineBrowseScreen(
+    setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
+    snackBarHostState: SnackbarHostState
+) {
     Log.d("DisciplineViewScreen",  "Opened")
+    setTopAppBar {
+        TopAppBarElement(
+            titleRes = R.string.screen_disciplinebrowse_process,
+            navManager = it
+        )
+    }
 
     val viewModel by remember { mutableStateOf(DisciplineBrowseViewModel()) }
     val uiState = viewModel.loadingUiState.collectAsState()
