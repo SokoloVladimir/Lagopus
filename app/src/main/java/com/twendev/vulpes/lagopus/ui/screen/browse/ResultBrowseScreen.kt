@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,10 +33,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Result
+import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Student
 import com.twendev.vulpes.lagopus.model.Work
+import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.NavigationManager
 import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.checkbox.InternalCheckBox
@@ -103,7 +108,7 @@ fun ResultBrowseScreenContent(
                     items(items) { item ->
                         ResultCard(
                             item = item,
-                            taskCount = work!!.taskCount,
+                            work = work!!,
                             setTaskState = { taskNumber, taskState ->
                                 val index = viewModel.items.indexOf(item)
                                 viewModel.items[index] = viewModel.items[index].copy(tasks = item.calculateWithNewTaskState(taskNumber, taskState))
@@ -123,8 +128,8 @@ fun ResultBrowseScreenContent(
 @Composable
 fun ResultCard(
     item : Result,
+    work: Work,
     setTaskState: (Int, Boolean) -> Unit,
-    taskCount: Int,
     onSave: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -132,7 +137,7 @@ fun ResultCard(
 
     ResultCardContent(
         item = item,
-        taskCount = taskCount,
+        work = work,
         isExpanded = isExpanded,
         isEdited = item.tasks != tasksBeforeEditing,
         setTaskState = setTaskState,
@@ -151,7 +156,7 @@ fun ResultCard(
 @Composable
 fun ResultCardContent(
     item: Result,
-    taskCount: Int,
+    work: Work,
     isExpanded: Boolean,
     isEdited : Boolean,
     setTaskState: (Int, Boolean) -> Unit,
@@ -171,32 +176,55 @@ fun ResultCardContent(
                 onChangeExpanded()
             }
     ) {
-        Column(
-            Modifier.padding(8.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = item.cachedStudent.toString(),
-                fontStyle = if (isEdited) FontStyle.Italic else null,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1
-            )
-            LazyRow(
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth().weight(1f, true)
             ) {
-                items(taskCount) { index ->
-                    Box(
-                        modifier = Modifier.padding(5.dp)
-                    ) {
-                        InternalCheckBox(
-                            value = (index + 1).toString(),
-                            checked = item.getTaskState(index),
-                            onCheckedChange = {
-                                setTaskState(index, it)
-                            },
-                            enabled = isExpanded
-                        )
+                Text(
+                    text = item.cachedStudent.toString(),
+                    fontStyle = if (isEdited) FontStyle.Italic else null,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+                LazyRow(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    items(work.taskCount) { index ->
+                        Box(
+                            modifier = Modifier.padding(5.dp)
+                        ) {
+                            InternalCheckBox(
+                                value = (index + 1).toString(),
+                                checked = item.getTaskState(index),
+                                onCheckedChange = {
+                                    setTaskState(index, it)
+                                },
+                                enabled = isExpanded
+                            )
+                        }
                     }
                 }
+            }
+            Box(
+                Modifier.padding(17.dp)
+            ) {
+                if (item.tasks.countOneBits() >= work.taskFor5) {
+                    Text(text = "5", fontSize = 25.sp)
+                }
+                else if (item.tasks.countOneBits() >= work.taskFor4) {
+                    Text(text = "4", fontSize = 25.sp)
+                }
+                else if (item.tasks.countOneBits() >= work.taskFor3) {
+                    Text(text = "3", fontSize = 25.sp)
+                }
+                else {
+                    Text(text = "2", fontSize = 25.sp)
+                }
+
             }
         }
     }
@@ -218,9 +246,56 @@ fun ResultCardContentPreview() {
                     groupId = 0
                 )
             ),
-            taskCount = 7,
+            work = Work(
+                id = 0,
+                number = 5,
+                theme = "Kotlin Division",
+                taskCount = 5,
+                taskFor3 = 5,
+                taskFor4 = 4,
+                taskFor5 = 5,
+                discipline = Discipline(name = "Мобильная разработка"),
+                semester = Semester(startYear = 2023, isSecond = true),
+                workType = WorkType(name = "Практическая работа")
+            ),
+            isExpanded = false,
+            isEdited = false,
+            setTaskState = { i, b -> },
+            onChangeExpanded = { }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ResultCardContentPreview_Expanded() {
+    LagopusTheme {
+        ResultCardContent(
+            item = Result(
+                studentId = 0,
+                workId = 0,
+                tasks = 4uL,
+                cachedStudent = Student(
+                    surname = "Surname",
+                    name = "Name",
+                    group = Group(),
+                    groupId = 0
+                )
+            ),
+            work = Work(
+                id = 0,
+                number = 5,
+                theme = "Kotlin Division",
+                taskCount = 5,
+                taskFor3 = 5,
+                taskFor4 = 4,
+                taskFor5 = 5,
+                discipline = Discipline(name = "Мобильная разработка"),
+                semester = Semester(startYear = 2023, isSecond = true),
+                workType = WorkType(name = "Практическая работа")
+            ),
             isExpanded = true,
-            isEdited = true,
+            isEdited = false,
             setTaskState = { i, b -> },
             onChangeExpanded = { }
         )
