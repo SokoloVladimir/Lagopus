@@ -14,6 +14,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -58,7 +60,6 @@ import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.GroupBrowseViewModel
 import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -71,29 +72,56 @@ fun GroupBrowseScreen(
     Log.d("GroupBrowseScreen",  "Opened")
 
     val viewModel by remember { mutableStateOf(GroupBrowseViewModel()) }
-    val uiState = viewModel.loadingUiState.collectAsState()
     val scope = rememberCoroutineScope()
 
     GroupBrowseScreenContent(
-        uiState = uiState,
-        viewModel = viewModel,
-        snackBarHostState = snackBarHostState,
-        coroutineScope = scope,
+        uiState = viewModel.loadingUiState.collectAsState(),
+        items = viewModel.items,
         onAssign = onAssign,
         onBrowseStudents = onBrowseStudents,
-        onBrowseWorkResults = onBrowseWorkResults
+        onBrowseWorkResults = onBrowseWorkResults,
+        onNameChange = { item, name ->
+            val index = viewModel.items.indexOf(item)
+            viewModel.items[index] = viewModel.items[index].copy(name = name)
+        },
+        onItemUpdate = viewModel::updateItem,
+        onItemDelete = {
+            viewModel.prepareDeleteItem(it)
+            scope.launch {
+                val snackBarResult = snackBarHostState.showSnackbar(
+                    message = "Запись ${it.id} удалена",
+                    actionLabel = "Undo",
+                    duration = SnackbarDuration.Short
+                )
+                when (snackBarResult) {
+                    SnackbarResult.ActionPerformed -> {
+                        Log.d("GroupEditScreen", "snackBar ActionPerformed")
+                        viewModel.cancelDeleteItem(it)
+                    }
+                    SnackbarResult.Dismissed -> {
+                        Log.d("GroupEditScreen", "snackBar Dismissed")
+                        viewModel.confirmDeleteItem(it)
+                    }
+                }
+            }
+        },
+        onItemCreate = {
+            viewModel.createItem(Group())
+        }
     )
 }
 
 @Composable
 fun GroupBrowseScreenContent(
     uiState : State<LoadingUiState>,
-    viewModel: GroupBrowseViewModel,
-    snackBarHostState : SnackbarHostState,
-    coroutineScope : CoroutineScope,
+    items: List<Group>,
     onAssign: (Group) -> Unit,
     onBrowseStudents: (Group) -> Unit,
-    onBrowseWorkResults: (Group) -> Unit
+    onBrowseWorkResults: (Group) -> Unit,
+    onNameChange: (Group, String) -> Unit,
+    onItemUpdate: (Group) -> Unit,
+    onItemDelete: (Group) -> Unit,
+    onItemCreate: () -> Unit
 ) {
     Box {
         if (uiState.value.isLoading) {
@@ -109,36 +137,14 @@ fun GroupBrowseScreenContent(
         LazyColumn(
             contentPadding = PaddingValues(15.dp)
         ) {
-            items(viewModel.items) { item ->
+            items(items) { item ->
                 GroupCard(
                     item = item,
                     onNameChange = {
-                        val index = viewModel.items.indexOf(item)
-                        viewModel.items[index] = viewModel.items[index].copy(name = it)
+                        onNameChange(item, it)
                     },
-                    onSave = {
-                        viewModel.updateItem(it)
-                    },
-                    onDelete = {
-                        viewModel.prepareDeleteItem(it)
-                        coroutineScope.launch {
-                            val snackBarResult = snackBarHostState.showSnackbar(
-                                message = "Запись ${it.id} удалена",
-                                actionLabel = "Undo",
-                                duration = SnackbarDuration.Short
-                            )
-                            when (snackBarResult) {
-                                SnackbarResult.ActionPerformed -> {
-                                    Log.d("GroupEditScreen", "snackBar ActionPerformed")
-                                    viewModel.cancelDeleteItem(it)
-                                }
-                                SnackbarResult.Dismissed -> {
-                                    Log.d("GroupEditScreen", "snackBar Dismissed")
-                                    viewModel.confirmDeleteItem(it)
-                                }
-                            }
-                        }
-                    },
+                    onSave = onItemUpdate,
+                    onDelete = onItemDelete,
                     onAssign = onAssign,
                     onBrowseStudents = onBrowseStudents,
                     onBrowseWorkResults = onBrowseWorkResults
@@ -148,9 +154,7 @@ fun GroupBrowseScreenContent(
 
             item {
                 IconButton(
-                    onClick = {
-                        viewModel.createItem(Group())
-                    },
+                    onClick = onItemCreate,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row {
@@ -209,7 +213,9 @@ fun GroupCard(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun GroupCardContent(
     item: Group,
@@ -266,7 +272,8 @@ fun GroupCardContent(
                     keyboardActions = KeyboardActions(onDone = { onEditModeSwitch() }),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
-                Row {
+
+                FlowRow {
                     OutlinedButton(onClick = onDeleteClick) {
                         Icon(imageVector = Icons.Filled.Delete, contentDescription = "delete")
                         Text(text = "Удалить")
@@ -275,8 +282,8 @@ fun GroupCardContent(
                         Icon(imageVector = Icons.Filled.DateRange, contentDescription = "assign")
                         Text(text = "Назначить работу")
                     }
-                }
-                Row {
+
+
                     OutlinedButton(onClick = onBrowseStudentsClick) {
                         Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "students")
                         Text(text = "Студенты")
