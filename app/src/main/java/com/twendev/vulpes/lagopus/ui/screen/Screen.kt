@@ -86,6 +86,10 @@ sealed class Screen(
         route = "resultbrowsescreen",
         icon = Icons.Filled.Favorite
     )
+    object AssignmentAlterScreen : Screen.WorkableGroupable(
+        route = "assignmentalterscreen",
+        icon = Icons.Filled.Lock
+    )
     object NotFound : Screen(
         route = "notfound",
         icon = Icons.Filled.Lock

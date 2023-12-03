@@ -274,6 +274,31 @@ class MainActivity : ComponentActivity() {
                                             groupId = groupId!!
                                         )
                                     }
+                                    composable(
+                                            route = Screen.AssignmentAlterScreen.withGroupIdAndWorkId(),
+                                    arguments = listOf(
+                                        navArgument("workId") {
+                                            type = NavType.IntType
+                                        },
+                                        navArgument("groupId") {
+                                            type = NavType.IntType
+                                        }
+                                    )
+                                    ) { navStackEntry ->
+                                    val workId = navStackEntry.arguments?.getInt("workId")
+                                    val groupId = navStackEntry.arguments?.getInt("groupId")
+                                    AssignmentAlterScreen(
+                                        workId = workId!!,
+                                        groupId = groupId!!,
+                                        onConfirm = {
+                                            navManager.navTo(Screen.GroupBrowseScreen.route) {
+                                                popUpTo(navManager.navController.graph.startDestinationId) {
+                                                    saveState = false
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
                                 }
                             }
                         }
