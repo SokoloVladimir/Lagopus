@@ -21,7 +21,7 @@ data class WorkBrowseUiState(
     val selectedSemester: Semester? = null
 )
 
-class WorkBrowseViewModel : LoadableViewModel() {
+class WorkBrowseViewModel(val onItemClick: (Work) -> Unit) : LoadableViewModel() {
     private val repository = WorkRepository()
 
     private val _uiState = MutableStateFlow(WorkBrowseUiState())

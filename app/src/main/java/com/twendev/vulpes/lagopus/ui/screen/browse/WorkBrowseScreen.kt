@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,14 +54,12 @@ import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
 fun WorkBrowseScreen(onItemClick: (Work) -> Unit) {
     Log.d("WorkBrowseScreen",  "Opened")
 
-    val viewModel by remember { mutableStateOf(WorkBrowseViewModel()) }
-    val loadingUiState = viewModel.loadingUiState.collectAsState()
-    val uiState = viewModel.uiState.collectAsState()
+    val viewModel by remember { mutableStateOf(WorkBrowseViewModel(onItemClick)) }
 
     WorkBrowseScreenContent(
-        loadingUiState = loadingUiState.value,
-        uiState = uiState.value,
-        viewModel = viewModel,
+        loadingUiState = viewModel.loadingUiState.collectAsState(),
+        uiState = viewModel.uiState.collectAsState(),
+        items = viewModel.items,
         filterByDiscipline = {
             viewModel.filterByDiscipline(it)
         },
@@ -70,22 +69,22 @@ fun WorkBrowseScreen(onItemClick: (Work) -> Unit) {
         filterBySemester = {
             viewModel.filterBySemester(it)
         },
-        onItemClick = onItemClick,
+        onItemClick = viewModel.onItemClick,
     )
 }
 
 @Composable
 fun WorkBrowseScreenContent(
-    loadingUiState : LoadingUiState,
-    uiState: WorkBrowseUiState,
-    viewModel: WorkBrowseViewModel,
+    loadingUiState : State<LoadingUiState>,
+    uiState: State<WorkBrowseUiState>,
+    items: List<Work>,
     filterByDiscipline : (Discipline) -> Unit,
     filterByWorkType : (WorkType) -> Unit,
     filterBySemester : (Semester) -> Unit,
     onItemClick: (Work) -> Unit
 ) {
     Box {
-        if (loadingUiState.loading != LoadingStatus.None) {
+        if (loadingUiState.value.loading != LoadingStatus.None) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -95,9 +94,10 @@ fun WorkBrowseScreenContent(
             }
         }
 
-        if (loadingUiState.loading != LoadingStatus.Full) {
-            var isFilterExpanded by remember { mutableStateOf(false) }
+        if (loadingUiState.value.loading != LoadingStatus.Full) {
             Column {
+                var isFilterExpanded by remember { mutableStateOf(false) }
+
                 Column(Modifier.padding(15.dp)) {
                     OutlinedButton(onClick = {
                         isFilterExpanded = !isFilterExpanded
@@ -111,9 +111,9 @@ fun WorkBrowseScreenContent(
                         Column {
                             // TODO: завести string resources
                             // TODO: переписать dropdown на resetable/добавить рядом кнопку сброса
-                            OutlinedDropdown(items = uiState.disciplines, onSelect = filterByDiscipline, placeholder = "Дисциплина")
-                            OutlinedDropdown(items = uiState.workTypes, onSelect = filterByWorkType, placeholder = "Тип работы")
-                            OutlinedDropdown(items = uiState.semesters, onSelect = filterBySemester, placeholder = "Семестр")
+                            OutlinedDropdown(items = uiState.value.disciplines, onSelect = filterByDiscipline, placeholder = "Дисциплина")
+                            OutlinedDropdown(items = uiState.value.workTypes, onSelect = filterByWorkType, placeholder = "Тип работы")
+                            OutlinedDropdown(items = uiState.value.semesters, onSelect = filterBySemester, placeholder = "Семестр")
                         }
                     }
                 }
@@ -124,11 +124,11 @@ fun WorkBrowseScreenContent(
                     contentPadding = PaddingValues(15.dp)
                 ) {
 
-                    items(viewModel.items) { item ->
+                    items(items) { item ->
                         if (
                             !isFilterExpanded ||
-                            (uiState.selectedDiscipline == null || uiState.selectedDiscipline == item.discipline)
-                            && (uiState.selectedWorkType == null || uiState.selectedWorkType == item.workType)
+                            (uiState.value.selectedDiscipline == null || uiState.value.selectedDiscipline == item.discipline)
+                            && (uiState.value.selectedWorkType == null || uiState.value.selectedWorkType == item.workType)
                         ) {
                             WorkCard(
                                 item = item,
