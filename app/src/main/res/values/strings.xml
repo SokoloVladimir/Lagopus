@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">Lagopus</string>
-    <string name="screen_main_process">Main</string>
+    <string name="screen_derivative_process">Misc</string>
     <string name="screen_auth_process">Auth</string>
     <string name="screen_disciplinebrowse_process">Browse discipline</string>
     <string name="screen_worktypebrowse_process">Browse work\'s type</string>
     <string name="screen_semesterbrowse_process">Browse semester</string>
     <string name="screen_workbrowse_process">Browse work</string>
     <string name="screen_workalter_process">Alter work</string>
-    <string name="screen_main_fullname">Main screen</string>
+    <string name="screen_derivative_fullname">Misc Screen</string>
     <string name="screen_auth_fullname">Auth screen</string>
     <string name="screen_disciplinebrowse_fullname">Disciplines screen</string>
     <string name="screen_worktypebrowse_fullname">Work\'s types screen</string>

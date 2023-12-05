@@ -3,15 +3,15 @@ package com.twendev.vulpes.lagopus.ui.screen
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(
@@ -38,9 +38,9 @@ sealed class Screen(
         }
     }
 
-    object MainScreen : Screen(
-        route = "main",
-        icon = Icons.Filled.Home
+    object DerivativeScreen : Screen(
+        route = "derivative",
+        icon = Icons.Filled.List
     )
     object AuthScreen : Screen(
         route = "auth",
@@ -60,7 +60,7 @@ sealed class Screen(
     )
     object WorkBrowseScreen : Screen(
         route = "workbrowse",
-        icon = Icons.Filled.PlayArrow
+        icon = Icons.Filled.DateRange
     )
     object WorkAlterScreen : Screen(
         route = "workalter",
@@ -68,7 +68,7 @@ sealed class Screen(
     )
     object GroupBrowseScreen : Screen(
         route = "groupbrowse",
-        icon = Icons.Filled.ArrowBack
+        icon = Icons.Filled.Person
     )
     object GroupAssignWorkBrowse : Screen.Groupable (
         route = "groupassignworkbrowse",

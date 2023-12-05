@@ -74,11 +74,8 @@ private fun ScaffoldElementContent(
 @Composable
 private fun ScaffoldElementBottomBar(navManager: NavigationManager, destination: NavDestination?) {
     val items = listOf(
-        Screen.MainScreen,
-        Screen.DisciplineBrowseScreen,
-        Screen.WorkTypeBrowseScreen,
+        Screen.DerivativeScreen,
         Screen.WorkBrowseScreen,
-        Screen.SemesterBrowseScreen,
         Screen.GroupBrowseScreen
     )
 
