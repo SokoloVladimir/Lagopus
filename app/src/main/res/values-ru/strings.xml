@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lagopus</string>
+    <string name="screen_derivative_process">Вторичные настройки</string>
+    <string name="screen_auth_process">Авторизация</string>
+    <string name="screen_disciplinebrowse_process">Дисциплины</string>
+    <string name="screen_worktypebrowse_process">Типы работ</string>
+    <string name="screen_semesterbrowse_process">Семестры</string>
+    <string name="screen_workbrowse_process">Работы</string>
+    <string name="screen_workalter_process">Редактура работы</string>
+    <string name="screen_derivative_fullname">Вторичный экран</string>
+    <string name="screen_auth_fullname">Экран авторизации</string>
+    <string name="screen_disciplinebrowse_fullname">Экран дисциплин</string>
+    <string name="screen_worktypebrowse_fullname">Экран типов работ</string>
+    <string name="screen_semesterbrowse_fullname">Экран семестров</string>
+    <string name="screen_workalter_fullname">Экран редактуры работы</string>
+    <string name="screen_notfound_process">Не найдено</string>
+    <string name="screen_notfound_fullname">Страница-потеряшка</string>
+</resources>
