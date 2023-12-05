@@ -56,14 +56,14 @@ fun AuthScreen(
 
     val instanceController by remember { mutableStateOf(
         SearchableDropdownController(
-            list = listOf("https://zerda.twenkey.ru", "http://200.0.0.54:5205")
+            list = listOf("https://zerda.twenkey.ru")
         )
     )}
     val tryToConnect : () -> Unit = {
         scope.launch {
             loadingStatus = navigateToMainScreen(instanceController.uiState.value.selectedText)
             if (!loadingStatus) {
-                showMessage("Failed to fetch API")
+                showMessage("Ошибка подключения к API")
             }
         }
     }
@@ -106,11 +106,11 @@ fun <T> AuthScreenContent(
         if (isLoading) {
             CircleLoading()
         } else {
-            SearchableDropdown(placeholder = "Instance of API", controller = instanceSearchableDropdownController)
+            SearchableDropdown(placeholder = "Инстанс API", controller = instanceSearchableDropdownController)
             OutlinedTextField(
                 value = login,
                 onValueChange = onLoginChange,
-                label = { Text("Login") },
+                label = { Text("Логин") },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = {
                     onLoginKeyboardAction()
@@ -120,7 +120,7 @@ fun <T> AuthScreenContent(
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
-                label = { Text("Password") },
+                label = { Text("Пароль") },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go, keyboardType = KeyboardType.Password),
                 keyboardActions = KeyboardActions(onGo = {
                     onPasswordKeyBoardAction()
@@ -131,7 +131,7 @@ fun <T> AuthScreenContent(
                 onClick = onLogin,
                 shape = RectangleShape
             ) {
-                Text("Log in")
+                Text("Вход")
             }
         }
     }
