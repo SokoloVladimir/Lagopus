@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AuthScreen(
     setTopAppBar: (@Composable (NavigationManager) -> Unit) -> Unit,
-    navigateToMainScreen : suspend (instance: String) -> Boolean,
+    resolveAuth : suspend (instance: String, login: String, password: String) -> Boolean,
     showMessage : suspend (message: String) -> Unit
 ) {
     Log.d("AuthScreen", "Opened")
@@ -51,8 +51,8 @@ fun AuthScreen(
     val focusManager = LocalFocusManager.current
 
     var loadingStatus by remember { mutableStateOf(false) }
-    var login by remember { mutableStateOf("") }
-    var passw by remember { mutableStateOf("") }
+    var login by remember { mutableStateOf("admin") }
+    var passw by remember { mutableStateOf("admin") }
 
     val instanceController by remember { mutableStateOf(
         SearchableDropdownController(
@@ -61,7 +61,7 @@ fun AuthScreen(
     )}
     val tryToConnect : () -> Unit = {
         scope.launch {
-            loadingStatus = navigateToMainScreen(instanceController.uiState.value.selectedText)
+            loadingStatus = resolveAuth(instanceController.uiState.value.selectedText, login, passw)
             if (!loadingStatus) {
                 showMessage("Ошибка подключения к API")
             }

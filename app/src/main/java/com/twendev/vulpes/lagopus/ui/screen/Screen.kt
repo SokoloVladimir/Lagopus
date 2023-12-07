@@ -79,15 +79,19 @@ sealed class Screen(
         icon = Icons.Filled.ArrowDropDown
     )
     object StudentBrowseScreen : Screen.Groupable (
-        route = "studentbrowsescreen",
+        route = "studentbrowse",
         icon = Icons.Filled.AccountCircle
     )
     object ResultBrowseScreen : Screen.WorkableGroupable (
-        route = "resultbrowsescreen",
+        route = "resultbrowse",
         icon = Icons.Filled.Favorite
     )
     object AssignmentAlterScreen : Screen.WorkableGroupable(
-        route = "assignmentalterscreen",
+        route = "assignmentalter",
+        icon = Icons.Filled.Lock
+    )
+    object StudentResultScreen : Screen(
+        route = "studentresult",
         icon = Icons.Filled.Lock
     )
     object NotFound : Screen(

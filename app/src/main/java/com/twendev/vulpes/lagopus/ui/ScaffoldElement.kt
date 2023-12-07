@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.screen.Screen
 
 @Composable
@@ -32,7 +33,8 @@ fun ScaffoldElement(
         snackbarHostState = snackbarHostState,
         topAppBar = { topAppBar(navManager) },
         bottomAppBar = {
-            if (navBackStackEntry?.destination?.route != Screen.AuthScreen.route) {
+            if (navBackStackEntry?.destination?.route != Screen.AuthScreen.route
+                && ZerdaService.Singleton.bearer?.role == "teacher") {
                 ScaffoldElementBottomBar(
                     navManager = navManager,
                     destination = navBackStackEntry?.destination
