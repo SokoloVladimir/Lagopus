@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
@@ -90,7 +91,7 @@ private fun ScaffoldElementBottomBar(navManager: NavigationManager, destination:
                         contentDescription = null
                     )
                 },
-                label = { Text(item.route) },
+                label = { Text(LocalContext.current.getString(item.nameRes)) },
                 selected = destination?.hierarchy?.any { it.route == item.route } == true,
                 onClick = {
                     navManager.navTo(item.route) {

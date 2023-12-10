@@ -1,5 +1,6 @@
 package com.twendev.vulpes.lagopus.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,7 +25,7 @@ import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 
 @Composable
 fun TopAppBarElement(
-    titleRes: Int,
+    @StringRes titleRes: Int,
     navManager: NavigationManager,
     dropdownMap: Map<String, () -> Unit>? = null,
     isBackable: Boolean = true,
