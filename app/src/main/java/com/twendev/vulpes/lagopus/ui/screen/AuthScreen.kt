@@ -29,6 +29,7 @@ import com.twendev.vulpes.lagopus.ui.TopAppBarElement
 import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
+import com.twendev.vulpes.lagopus.ui.component.textfield.PasswordTextField
 import kotlinx.coroutines.launch
 
 @Composable
@@ -117,7 +118,8 @@ fun <T> AuthScreenContent(
                 }),
                 singleLine = true
             )
-            OutlinedTextField(
+
+            PasswordTextField(
                 value = password,
                 onValueChange = onPasswordChange,
                 label = { Text("Пароль") },
