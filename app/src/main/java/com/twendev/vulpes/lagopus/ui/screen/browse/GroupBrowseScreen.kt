@@ -44,14 +44,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -59,9 +56,7 @@ import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.ui.NavigationManager
 import com.twendev.vulpes.lagopus.ui.TopAppBarElement
-import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.viewmodel.GroupBrowseViewModel
-import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -84,7 +79,6 @@ fun GroupBrowseScreen(
     val scope = rememberCoroutineScope()
 
     GroupBrowseScreenContent(
-        uiState = viewModel.loadingUiState.collectAsState(),
         items = viewModel.items,
         onAssign = onAssign,
         onBrowseStudents = onBrowseStudents,
@@ -116,13 +110,15 @@ fun GroupBrowseScreen(
         },
         onItemCreate = {
             viewModel.createItem(Group())
+        },
+        loadableCompose = {
+            viewModel.WithLoadable(it)
         }
     )
 }
 
 @Composable
 fun GroupBrowseScreenContent(
-    uiState : State<LoadingUiState>,
     items: List<Group>,
     onAssign: (Group) -> Unit,
     onBrowseStudents: (Group) -> Unit,
@@ -130,19 +126,10 @@ fun GroupBrowseScreenContent(
     onNameChange: (Group, String) -> Unit,
     onItemUpdate: (Group) -> Unit,
     onItemDelete: (Group) -> Unit,
-    onItemCreate: () -> Unit
+    onItemCreate: () -> Unit,
+    loadableCompose: @Composable (@Composable () -> Unit) -> Unit,
 ) {
-    Box {
-        if (uiState.value.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircleLoading()
-            }
-        }
-
+    loadableCompose {
         LazyColumn(
             contentPadding = PaddingValues(15.dp)
         ) {

@@ -6,13 +6,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,10 +42,7 @@ import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
 import com.twendev.vulpes.lagopus.ui.NavigationManager
 import com.twendev.vulpes.lagopus.ui.TopAppBarElement
-import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.dropdown.OutlinedDropdown
-import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingStatus
-import com.twendev.vulpes.lagopus.ui.viewmodel.LoadingUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseUiState
 import com.twendev.vulpes.lagopus.ui.viewmodel.WorkBrowseViewModel
 
@@ -69,7 +62,6 @@ fun WorkBrowseScreen(
     val viewModel by remember { mutableStateOf(WorkBrowseViewModel(onItemClick)) }
 
     WorkBrowseScreenContent(
-        loadingUiState = viewModel.loadingUiState.collectAsState(),
         uiState = viewModel.uiState.collectAsState(),
         items = viewModel.items,
         filterByDiscipline = {
@@ -82,87 +74,78 @@ fun WorkBrowseScreen(
             viewModel.filterBySemester(it)
         },
         onItemClick = viewModel.onItemClick,
+        loadableCompose = {
+            viewModel.WithLoadable(it)
+        }
     )
 }
 
 @Composable
 fun WorkBrowseScreenContent(
-    loadingUiState : State<LoadingUiState>,
     uiState: State<WorkBrowseUiState>,
     items: List<Work>,
     filterByDiscipline : (Discipline) -> Unit,
     filterByWorkType : (WorkType) -> Unit,
     filterBySemester : (Semester) -> Unit,
-    onItemClick: (Work) -> Unit
+    onItemClick: (Work) -> Unit,
+    loadableCompose: @Composable (@Composable () -> Unit) -> Unit,
 ) {
-    Box {
-        if (loadingUiState.value.loading != LoadingStatus.None) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircleLoading()
-            }
-        }
+    loadableCompose {
+        Column {
+            var isFilterExpanded by remember { mutableStateOf(false) }
 
-        if (loadingUiState.value.loading != LoadingStatus.Full) {
-            Column {
-                var isFilterExpanded by remember { mutableStateOf(false) }
-
-                Column(Modifier.padding(15.dp)) {
-                    OutlinedButton(onClick = {
-                        isFilterExpanded = !isFilterExpanded
-                    }) {
-                        Text(
-                            text = "Фильтрация:",
-                            modifier = Modifier.padding(0.dp, 10.dp)
-                        )
+            Column(Modifier.padding(15.dp)) {
+                OutlinedButton(onClick = {
+                    isFilterExpanded = !isFilterExpanded
+                }) {
+                    Text(
+                        text = "Фильтрация:",
+                        modifier = Modifier.padding(0.dp, 10.dp)
+                    )
+                }
+                AnimatedVisibility(visible = isFilterExpanded) {
+                    Column {
+                        // TODO: завести string resources
+                        // TODO: переписать dropdown на resetable/добавить рядом кнопку сброса
+                        OutlinedDropdown(items = uiState.value.disciplines, onSelect = filterByDiscipline, placeholder = "Дисциплина")
+                        OutlinedDropdown(items = uiState.value.workTypes, onSelect = filterByWorkType, placeholder = "Тип работы")
+                        OutlinedDropdown(items = uiState.value.semesters, onSelect = filterBySemester, placeholder = "Семестр")
                     }
-                    AnimatedVisibility(visible = isFilterExpanded) {
-                        Column {
-                            // TODO: завести string resources
-                            // TODO: переписать dropdown на resetable/добавить рядом кнопку сброса
-                            OutlinedDropdown(items = uiState.value.disciplines, onSelect = filterByDiscipline, placeholder = "Дисциплина")
-                            OutlinedDropdown(items = uiState.value.workTypes, onSelect = filterByWorkType, placeholder = "Тип работы")
-                            OutlinedDropdown(items = uiState.value.semesters, onSelect = filterBySemester, placeholder = "Семестр")
-                        }
+                }
+            }
+
+            Divider(color = Color.Black, thickness = 1.dp)
+
+            LazyColumn(
+                contentPadding = PaddingValues(15.dp)
+            ) {
+
+                items(items) { item ->
+                    if (
+                        !isFilterExpanded ||
+                        (uiState.value.selectedDiscipline == null || uiState.value.selectedDiscipline == item.discipline)
+                        && (uiState.value.selectedWorkType == null || uiState.value.selectedWorkType == item.workType)
+                    ) {
+                        WorkCard(
+                            item = item,
+                            onClick = {
+                                onItemClick(item)
+                            }
+                        )
+                        Spacer(Modifier.height(15.dp))
                     }
                 }
 
-                Divider(color = Color.Black, thickness = 1.dp)
-
-                LazyColumn(
-                    contentPadding = PaddingValues(15.dp)
-                ) {
-
-                    items(items) { item ->
-                        if (
-                            !isFilterExpanded ||
-                            (uiState.value.selectedDiscipline == null || uiState.value.selectedDiscipline == item.discipline)
-                            && (uiState.value.selectedWorkType == null || uiState.value.selectedWorkType == item.workType)
-                        ) {
-                            WorkCard(
-                                item = item,
-                                onClick = {
-                                    onItemClick(item)
-                                }
-                            )
-                            Spacer(Modifier.height(15.dp))
-                        }
-                    }
-
-                    item {
-                        IconButton(
-                            onClick = {
-                                onItemClick(Work())
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row {
-                                Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
-                                Text(text = "Новая запись")
-                            }
+                item {
+                    IconButton(
+                        onClick = {
+                            onItemClick(Work())
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row {
+                            Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
+                            Text(text = "Новая запись")
                         }
                     }
                 }
