@@ -48,7 +48,7 @@ fun Navigation(
                         ZerdaService.Singleton.bearer = ZerdaService.Singleton.api.getBearer(login, password)
 
                         if (ZerdaService.Singleton.bearer?.role == "teacher") {
-                            navManager.navTo(Screen.DerivativeScreen.route)
+                            navManager.navTo(Screen.GroupBrowseScreen.route)
                         } else {
                             navManager.navTo(Screen.StudentResultScreen.route)
                         }
