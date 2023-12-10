@@ -11,15 +11,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -52,7 +49,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.twendev.vulpes.lagopus.R
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.ui.NavigationManager
 import com.twendev.vulpes.lagopus.ui.TopAppBarElement
@@ -70,7 +69,7 @@ fun GroupBrowseScreen(
     Log.d("GroupBrowseScreen",  "Opened")
     setTopAppBar {
         TopAppBarElement(
-            title = "GroupBrowse",
+            title = LocalContext.current.getString(R.string.screen_groupbrowse_process),
             navManager = it
         )
     }

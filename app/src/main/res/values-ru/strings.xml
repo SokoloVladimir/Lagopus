@@ -18,4 +18,5 @@
     <string name="screen_notfound_fullname">Страница-потеряшка</string>
     <string name="screen_workbrowse_fullname">Работы</string>
     <string name="screen_groupbrowse_fullname">Группы</string>
+    <string name="screen_groupbrowse_process">Выбор группы</string>
 </resources>
