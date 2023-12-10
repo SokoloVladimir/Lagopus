@@ -10,6 +10,7 @@ object RetrofitClient {
     private val okHttpClient = OkHttpClient()
         .newBuilder()
         .addInterceptor(RequestInterceptor)
+        .addInterceptor(BearerInterceptor)
         .build()
 
     fun getClient(baseUrl: String? = null): Retrofit =

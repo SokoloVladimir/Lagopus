@@ -15,4 +15,7 @@
     <string name="screen_workalter_fullname">Altering work screen</string>
     <string name="screen_notfound_process">Not found</string>
     <string name="screen_notfound_fullname">Not found screen</string>
+    <string name="screen_workbrowse_fullname">Browse work</string>
+    <string name="screen_groupbrowse_fullname">Browse group</string>
+    <string name="screen_groupbrowse_process">Browse group</string>
 </resources>

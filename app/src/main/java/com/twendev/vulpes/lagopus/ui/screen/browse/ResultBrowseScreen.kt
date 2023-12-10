@@ -106,7 +106,7 @@ fun ResultBrowseScreenContent(
                     contentPadding = PaddingValues(15.dp)
                 ) {
                     items(items) { item ->
-                        ResultCard(
+                        ResultCardExpandable(
                             item = item,
                             work = work!!,
                             setTaskState = { taskNumber, taskState ->
@@ -126,7 +126,7 @@ fun ResultBrowseScreenContent(
 }
 
 @Composable
-fun ResultCard(
+fun ResultCardExpandable(
     item : Result,
     work: Work,
     setTaskState: (Int, Boolean) -> Unit,
@@ -136,6 +136,7 @@ fun ResultCard(
     var tasksBeforeEditing by remember { mutableStateOf(item.tasks) }
 
     ResultCardContent(
+        header = item.cachedStudent.toString(),
         item = item,
         work = work,
         isExpanded = isExpanded,
@@ -155,6 +156,7 @@ fun ResultCard(
 
 @Composable
 fun ResultCardContent(
+    header: String,
     item: Result,
     work: Work,
     isExpanded: Boolean,
@@ -185,7 +187,7 @@ fun ResultCardContent(
                     .fillMaxWidth().weight(1f, true)
             ) {
                 Text(
-                    text = item.cachedStudent.toString(),
+                    text = header,
                     fontStyle = if (isEdited) FontStyle.Italic else null,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
@@ -235,6 +237,12 @@ fun ResultCardContent(
 fun ResultCardContentPreview() {
     LagopusTheme {
         ResultCardContent(
+            header = Student(
+                surname = "Surname",
+                name = "Name",
+                group = Group(),
+                groupId = 0
+            ).toString(),
             item = Result(
                 studentId = 0,
                 workId = 0,
@@ -271,6 +279,12 @@ fun ResultCardContentPreview() {
 fun ResultCardContentPreview_Expanded() {
     LagopusTheme {
         ResultCardContent(
+            header = Student(
+                surname = "Surname",
+                name = "Name",
+                group = Group(),
+                groupId = 0
+            ).toString(),
             item = Result(
                 studentId = 0,
                 workId = 0,

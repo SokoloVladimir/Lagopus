@@ -38,6 +38,8 @@ class ResultBrowseViewModel(
             for (item in items) {
                 item.cacheStudent()
             }
+
+            items.sortWith(compareBy<Result> { it.cachedStudent?.surname }.thenBy { it.cachedStudent?.name })
         }
     }
 

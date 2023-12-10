@@ -63,6 +63,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
     implementation("com.chargemap.compose:numberpicker:1.0.3")
 
     implementation("androidx.navigation:navigation-compose:2.7.5")

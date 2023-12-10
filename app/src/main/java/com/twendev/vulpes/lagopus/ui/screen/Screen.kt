@@ -1,5 +1,6 @@
 package com.twendev.vulpes.lagopus.ui.screen
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
@@ -13,12 +14,14 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.twendev.vulpes.lagopus.R
 
 sealed class Screen(
     val route: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    @StringRes val nameRes: Int = 0
 ) {
-    sealed class Groupable(route: String, icon: ImageVector) : Screen(route, icon) {
+    sealed class Groupable(route: String, icon: ImageVector, nameRes: Int = 0) : Screen(route, icon, nameRes) {
         fun withGroupId(): String {
             return "$route?groupId={groupId}"
         }
@@ -28,7 +31,7 @@ sealed class Screen(
         }
     }
 
-    sealed class WorkableGroupable(route: String, icon: ImageVector) : Screen(route, icon) {
+    sealed class WorkableGroupable(route: String, icon: ImageVector, nameRes: Int = 0) : Screen(route, icon, nameRes) {
         fun withGroupIdAndWorkId(): String {
             return "$route?groupId={groupId}&workId={workId}"
         }
@@ -40,7 +43,8 @@ sealed class Screen(
 
     object DerivativeScreen : Screen(
         route = "derivative",
-        icon = Icons.Filled.List
+        icon = Icons.Filled.List,
+        nameRes = R.string.screen_derivative_fullname
     )
     object AuthScreen : Screen(
         route = "auth",
@@ -60,7 +64,8 @@ sealed class Screen(
     )
     object WorkBrowseScreen : Screen(
         route = "workbrowse",
-        icon = Icons.Filled.DateRange
+        icon = Icons.Filled.DateRange,
+        nameRes = R.string.screen_workbrowse_fullname
     )
     object WorkAlterScreen : Screen(
         route = "workalter",
@@ -68,7 +73,8 @@ sealed class Screen(
     )
     object GroupBrowseScreen : Screen(
         route = "groupbrowse",
-        icon = Icons.Filled.Person
+        icon = Icons.Filled.Person,
+        nameRes = R.string.screen_groupbrowse_fullname
     )
     object GroupAssignWorkBrowse : Screen.Groupable (
         route = "groupassignworkbrowse",
@@ -79,15 +85,19 @@ sealed class Screen(
         icon = Icons.Filled.ArrowDropDown
     )
     object StudentBrowseScreen : Screen.Groupable (
-        route = "studentbrowsescreen",
+        route = "studentbrowse",
         icon = Icons.Filled.AccountCircle
     )
     object ResultBrowseScreen : Screen.WorkableGroupable (
-        route = "resultbrowsescreen",
+        route = "resultbrowse",
         icon = Icons.Filled.Favorite
     )
     object AssignmentAlterScreen : Screen.WorkableGroupable(
-        route = "assignmentalterscreen",
+        route = "assignmentalter",
+        icon = Icons.Filled.Lock
+    )
+    object StudentResultScreen : Screen(
+        route = "studentresult",
         icon = Icons.Filled.Lock
     )
     object NotFound : Screen(

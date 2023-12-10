@@ -8,10 +8,15 @@ data class Result (
     @SerializedName("workId"        ) val workId        : Int,
     @SerializedName("tasks"         ) val tasks         : ULong,
     @SerializedName("lastEdit"      ) val lastEdit      : String? = null,
-    @Transient                        var cachedStudent : Student? = null
+    @Transient                        var cachedStudent : Student? = null,
+    @Transient                        var cachedWork    : Work? = null
 ) {
     suspend fun cacheStudent() {
         cachedStudent = Repositories.student.get(studentId)
+    }
+
+    suspend fun cacheWork() {
+        cachedWork = Repositories.work.get(workId)
     }
 
     fun getTaskState(taskNumber: Int) : Boolean {

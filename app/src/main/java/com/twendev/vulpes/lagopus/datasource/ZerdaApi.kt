@@ -11,6 +11,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ZerdaApi {
+    @POST("/Account/token/{login}/{password}")
+    suspend fun getBearer(@Path("login") login: String, @Path("password") password: String) : Bearer
+
     @GET("/Assignment")
     suspend fun getAssignments() : Array<Assignment>
     @POST("/Assignment")
@@ -90,7 +93,4 @@ interface ZerdaApi {
         @Path("workId")          workId: Int,
         @Path("value")          value: ULong
     )
-
-    @GET("/Account")
-    suspend fun getAccounts() : Array<Account>
 }

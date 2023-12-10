@@ -12,6 +12,7 @@ import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.screen.AuthScreen
 import com.twendev.vulpes.lagopus.ui.screen.DerivativeScreen
 import com.twendev.vulpes.lagopus.ui.screen.Screen
+import com.twendev.vulpes.lagopus.ui.screen.StudentResultScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.DisciplineBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.GroupBrowseScreen
 import com.twendev.vulpes.lagopus.ui.screen.browse.ResultBrowseScreen
@@ -37,14 +38,21 @@ fun Navigation(
                 showMessage = {
                     snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
                 },
-                navigateToMainScreen = { url ->
+                resolveAuth = { url, login, password ->
                     try {
                         if (!url.contains("http")) {
                             throw IllegalArgumentException("wrong URL")
                         }
 
                         ZerdaService.Singleton = ZerdaService(url)
-                        navManager.navTo(Screen.DerivativeScreen.route)
+                        ZerdaService.Singleton.bearer = ZerdaService.Singleton.api.getBearer(login, password)
+
+                        if (ZerdaService.Singleton.bearer?.role == "teacher") {
+                            navManager.navTo(Screen.GroupBrowseScreen.route)
+                        } else {
+                            navManager.navTo(Screen.StudentResultScreen.route)
+                        }
+
                         true
                     } catch (ex : Exception) {
                         Log.d("MA:ex", ex.message ?: "empty")
@@ -230,6 +238,13 @@ fun Navigation(
                         }
                     }
                 }
+            )
+        }
+        composable(
+            route = Screen.StudentResultScreen.route
+        ) {
+            StudentResultScreen(
+                setTopAppBar = setAppBar
             )
         }
     }
