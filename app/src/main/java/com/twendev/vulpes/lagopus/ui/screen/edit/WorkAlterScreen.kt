@@ -65,9 +65,9 @@ fun WorkAlterScreen(
         disciplines = uiState.value.disciplines,
         workTypes = uiState.value.workTypes,
         semesters = uiState.value.semesters,
-        onItemUpdate = {
-            viewModel.updateItem(it)
-        },
+        onItemUpdate =
+            viewModel::updateItem
+        ,
         onItemSave = {
             viewModel.saveItem()
             navigateBack()
@@ -114,7 +114,7 @@ private fun WorkAlterScreenContent(
                     value = item.theme,
                     label = { Text(text = "Тема") },
                     singleLine = true,
-                    onValueChange = { onItemUpdate(item.copy(theme = it)) },
+                    onValueChange = { onItemUpdate(Work(theme = it)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(10.dp))
