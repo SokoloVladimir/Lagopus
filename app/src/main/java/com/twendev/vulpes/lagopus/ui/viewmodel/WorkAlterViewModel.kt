@@ -37,8 +37,6 @@ class WorkAlterViewModel(private val itemId: Int) : LoadableViewModel() {
                 repository.update(_uiState.value.item)
             }
         }
-
-
     }
 
     fun deleteItem() {
