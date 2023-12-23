@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.twendev.vulpes.lagopus.R
 import com.twendev.vulpes.lagopus.ui.NavigationManager
 import com.twendev.vulpes.lagopus.ui.TopAppBarElement
+import com.twendev.vulpes.lagopus.ui.theme.LagopusTheme
 
 @Composable
 fun DerivativeScreen(
@@ -66,9 +67,11 @@ fun DerivativeScreenContent(
 @Preview
 @Composable
 fun DerivativeScreenContentPreview() {
-    DerivativeScreenContent(
-        browseDisciplines = { },
-        browseWorkTypes = { },
-        browseSemesters = { }
-    )
+    LagopusTheme {
+        DerivativeScreenContent(
+            browseDisciplines = { },
+            browseWorkTypes = { },
+            browseSemesters = { }
+        )
+    }
 }
