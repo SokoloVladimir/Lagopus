@@ -1,7 +1,14 @@
 package com.twendev.vulpes.lagopus.datasource
 
-import com.twendev.vulpes.lagopus.model.*
-import retrofit2.*
+import com.twendev.vulpes.lagopus.model.Assignment
+import com.twendev.vulpes.lagopus.model.Bearer
+import com.twendev.vulpes.lagopus.model.Discipline
+import com.twendev.vulpes.lagopus.model.Group
+import com.twendev.vulpes.lagopus.model.Result
+import com.twendev.vulpes.lagopus.model.Semester
+import com.twendev.vulpes.lagopus.model.Student
+import com.twendev.vulpes.lagopus.model.Work
+import com.twendev.vulpes.lagopus.model.WorkType
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -11,6 +18,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ZerdaApi {
+    @GET("/health")
+    suspend fun healthCheck()
+
     @POST("/Account/token/{login}/{password}")
     suspend fun getBearer(@Path("login") login: String, @Path("password") password: String) : Bearer
 
