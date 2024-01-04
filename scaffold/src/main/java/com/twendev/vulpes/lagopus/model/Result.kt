@@ -1,7 +1,6 @@
 package com.twendev.vulpes.lagopus.model
 
 import com.google.gson.annotations.SerializedName
-import com.twendev.vulpes.lagopus.ui.repository.Repositories
 
 data class Result (
     @SerializedName("studentId"     ) val studentId     : Int,
@@ -11,14 +10,6 @@ data class Result (
     @Transient                        var cachedStudent : Student? = null,
     @Transient                        var cachedWork    : Work? = null
 ) {
-    suspend fun cacheStudent() {
-        cachedStudent = Repositories.student.get(studentId)
-    }
-
-    suspend fun cacheWork() {
-        cachedWork = Repositories.work.get(workId)
-    }
-
     fun getTaskState(taskNumber: Int) : Boolean {
         return ((1uL).shl(taskNumber).and(tasks)) != 0uL
     }

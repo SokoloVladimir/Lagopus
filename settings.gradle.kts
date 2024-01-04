@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Lagopus"
 include(":app")
- 
+include(":scaffold")

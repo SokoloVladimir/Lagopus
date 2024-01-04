@@ -1,6 +1,7 @@
 package com.twendev.vulpes.lagopus.ui.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
+import com.twendev.vulpes.lagopus.extensions.cacheStudent
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Result
 import com.twendev.vulpes.lagopus.model.Work

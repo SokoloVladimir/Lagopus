@@ -1,6 +1,5 @@
 package com.twendev.vulpes.lagopus.model
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 
 data class Work (
@@ -19,7 +18,6 @@ data class Work (
     @SerializedName("workType"     ) val workType     : WorkType?   = null
 ) {
     fun isSimular(compareText: String) : Boolean {
-        Log.d("Work","IsSimular($compareText) with ${workType?.name}")
         return (workType?.getShortName().plus(number)).startsWith(compareText.lowercase())
     }
     override fun toString(): String {
