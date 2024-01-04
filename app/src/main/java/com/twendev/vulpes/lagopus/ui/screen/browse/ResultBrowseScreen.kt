@@ -268,7 +268,7 @@ fun ResultCardContentPreview() {
             ),
             isExpanded = false,
             isEdited = false,
-            setTaskState = { i, b -> },
+            setTaskState = { _, _ -> },
             onChangeExpanded = { }
         )
     }
@@ -310,7 +310,7 @@ fun ResultCardContentPreview_Expanded() {
             ),
             isExpanded = true,
             isEdited = false,
-            setTaskState = { i, b -> },
+            setTaskState = { _, _ -> },
             onChangeExpanded = { }
         )
     }

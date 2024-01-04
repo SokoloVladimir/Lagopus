@@ -2,7 +2,6 @@ package com.twendev.vulpes.lagopus.ui.repository
 
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Assignment
-import com.twendev.vulpes.lagopus.model.WorkType
 
 class AssignmentRepository : RepositoryInterface<Assignment> {
     private val zerdaSource = ZerdaService.Singleton

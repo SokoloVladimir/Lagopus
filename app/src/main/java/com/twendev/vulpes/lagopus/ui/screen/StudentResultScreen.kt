@@ -70,7 +70,7 @@ fun StudentResultScreenContent(
                     work = item.cachedWork!!,
                     isExpanded = false,
                     isEdited = false,
-                    setTaskState = { i, b -> },
+                    setTaskState = { _, _ -> },
                     onChangeExpanded = { }
                 )
                 Spacer(Modifier.height(15.dp))
