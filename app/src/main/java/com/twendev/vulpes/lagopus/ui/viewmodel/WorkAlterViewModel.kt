@@ -4,7 +4,10 @@ import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
-import com.twendev.vulpes.lagopus.ui.repository.Repositories
+import com.twendev.vulpes.lagopus.ui.repository.DisciplineRepository
+import com.twendev.vulpes.lagopus.ui.repository.SemesterRepository
+import com.twendev.vulpes.lagopus.ui.repository.WorkRepository
+import com.twendev.vulpes.lagopus.ui.repository.WorkTypeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +21,7 @@ data class WorkAlterUiState(
 )
 
 class WorkAlterViewModel(private val itemId: Int) : LoadableViewModel() {
-    private val repository = Repositories.work
+    private val repository = WorkRepository()
 
     private val _uiState = MutableStateFlow(WorkAlterUiState())
     val uiState: StateFlow<WorkAlterUiState> = _uiState.asStateFlow()
@@ -58,9 +61,9 @@ class WorkAlterViewModel(private val itemId: Int) : LoadableViewModel() {
             _uiState.update {
                 it.copy(
                     item = repository.get(itemId) ?: Work(),
-                    disciplines = Repositories.discipline.get(),
-                    workTypes = Repositories.workType.get(),
-                    semesters =  Repositories.semester.get()
+                    disciplines = DisciplineRepository().get(),
+                    workTypes = WorkTypeRepository().get(),
+                    semesters =  SemesterRepository().get()
                 )
             }
         }

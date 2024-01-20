@@ -5,8 +5,10 @@ import com.twendev.vulpes.lagopus.extensions.cacheStudent
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Result
 import com.twendev.vulpes.lagopus.model.Work
-import com.twendev.vulpes.lagopus.ui.repository.Repositories
+import com.twendev.vulpes.lagopus.ui.repository.GroupRepository
 import com.twendev.vulpes.lagopus.ui.repository.ResultRepository
+import com.twendev.vulpes.lagopus.ui.repository.StudentRepository
+import com.twendev.vulpes.lagopus.ui.repository.WorkRepository
 
 
 class ResultBrowseViewModel(
@@ -21,12 +23,12 @@ class ResultBrowseViewModel(
 
     init {
         suspendAction {
-            work = Repositories.work.get(workId)
-            group = Repositories.group.get(groupId)
+            work = WorkRepository().get(workId)
+            group = GroupRepository().get(groupId)
         }
         suspendActionWithLoading {
             refreshAsync()
-            for (student in Repositories.student.getByGroupId(groupId = groupId)) {
+            for (student in StudentRepository().getByGroupId(groupId = groupId)) {
                 if (items.all { it.studentId != student.id }) {
                     items.add(Result(
                         studentId = student.id,

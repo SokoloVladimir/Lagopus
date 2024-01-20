@@ -5,8 +5,10 @@ import com.twendev.vulpes.lagopus.model.Discipline
 import com.twendev.vulpes.lagopus.model.Semester
 import com.twendev.vulpes.lagopus.model.Work
 import com.twendev.vulpes.lagopus.model.WorkType
-import com.twendev.vulpes.lagopus.ui.repository.Repositories
+import com.twendev.vulpes.lagopus.ui.repository.DisciplineRepository
+import com.twendev.vulpes.lagopus.ui.repository.SemesterRepository
 import com.twendev.vulpes.lagopus.ui.repository.WorkRepository
+import com.twendev.vulpes.lagopus.ui.repository.WorkTypeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -57,9 +59,9 @@ class WorkBrowseViewModel(val onItemClick: (Work) -> Unit) : LoadableViewModel()
             items.clear()
             _uiState.update {
                 it.copy(
-                    disciplines = Repositories.discipline.get(),
-                    workTypes = Repositories.workType.get(),
-                    semesters = Repositories.semester.get()
+                    disciplines = DisciplineRepository().get(),
+                    workTypes = WorkTypeRepository().get(),
+                    semesters = SemesterRepository().get()
                 )
             }
             items.addAll(repository.get().toMutableList())

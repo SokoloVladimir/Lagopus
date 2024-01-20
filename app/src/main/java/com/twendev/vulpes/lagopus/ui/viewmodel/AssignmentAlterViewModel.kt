@@ -3,7 +3,9 @@ package com.twendev.vulpes.lagopus.ui.viewmodel
 import com.twendev.vulpes.lagopus.model.Assignment
 import com.twendev.vulpes.lagopus.model.Group
 import com.twendev.vulpes.lagopus.model.Work
-import com.twendev.vulpes.lagopus.ui.repository.Repositories
+import com.twendev.vulpes.lagopus.ui.repository.AssignmentRepository
+import com.twendev.vulpes.lagopus.ui.repository.GroupRepository
+import com.twendev.vulpes.lagopus.ui.repository.WorkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +21,7 @@ class AssignmentAlterViewModel(
     private val workId: Int,
     private val groupId: Int
 ) : LoadableViewModel() {
-    private val repository = Repositories.assignment
+    private val repository = AssignmentRepository()
 
     private val _uiState = MutableStateFlow(AssignmentAlterUiState())
     val uiState: StateFlow<AssignmentAlterUiState> = _uiState.asStateFlow()
@@ -53,8 +55,8 @@ class AssignmentAlterViewModel(
             _uiState.update {
                 it.copy(
                     item = repository.get(workId = workId, groupId = groupId) ?: Assignment(workId = workId, groupId = groupId),
-                    work = Repositories.work.get(workId)!!,
-                    group = Repositories.group.get(groupId)!!
+                    work = WorkRepository().get(workId)!!,
+                    group = GroupRepository().get(groupId)!!
                 )
             }
         }
