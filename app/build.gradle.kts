@@ -11,8 +11,8 @@ android {
         applicationId = "com.twendev.vulpes.lagopus"
         minSdk = 25
         targetSdk = 33
-        versionCode = 2
-        versionName = "0.2"
+        versionCode = 4
+        versionName = "0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
