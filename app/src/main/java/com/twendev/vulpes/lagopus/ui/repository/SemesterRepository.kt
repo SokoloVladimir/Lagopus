@@ -2,9 +2,11 @@ package com.twendev.vulpes.lagopus.ui.repository
 
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Semester
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class SemesterRepository : RepositoryInterface<Semester> {
-    private val zerdaSource = ZerdaService.Singleton
+class SemesterRepository : RepositoryInterface<Semester>, KoinComponent {
+    private val zerdaSource : ZerdaService by inject()
     suspend fun get(id: Int) : Semester? {
         return zerdaSource.api.getSemesters().firstOrNull { it.id == id}
     }

@@ -3,11 +3,11 @@ package com.twendev.vulpes.lagopus.datasource
 import okhttp3.Interceptor
 import okhttp3.Response
 
-object BearerInterceptor : Interceptor {
+class BearerInterceptor(private val authOptions: AuthOptions) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        return if (ZerdaService.Singleton.bearer != null) {
+        return if (authOptions.bearer != null) {
             val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer ${ZerdaService.Singleton.bearer!!.accessToken}")
+                .addHeader("Authorization", "Bearer ${authOptions.bearer?.accessToken}")
                 .build()
             chain.proceed(request)
         } else {

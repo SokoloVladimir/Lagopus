@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    startKoinWithAndroidContext(this@MainActivity)
                     DrawerElement(rememberNavManager())
                 }
             }

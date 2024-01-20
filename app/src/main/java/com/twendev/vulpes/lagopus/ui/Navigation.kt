@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.twendev.vulpes.lagopus.datasource.ZerdaService
+import com.twendev.vulpes.lagopus.ui.repository.AuthRepository
 import com.twendev.vulpes.lagopus.ui.screen.AuthScreen
 import com.twendev.vulpes.lagopus.ui.screen.DerivativeScreen
 import com.twendev.vulpes.lagopus.ui.screen.Screen
@@ -44,10 +44,9 @@ fun Navigation(
                             throw IllegalArgumentException("wrong URL")
                         }
 
-                        ZerdaService.Singleton = ZerdaService(url)
-                        ZerdaService.Singleton.bearer = ZerdaService.Singleton.api.getBearer(login, password)
+                        AuthRepository().setInstanceUrl(url).auth(login, password)
 
-                        if (ZerdaService.Singleton.bearer?.role == "teacher") {
+                        if (AuthRepository().authRole == "teacher") {
                             navManager.navTo(Screen.GroupBrowseScreen.route)
                         } else {
                             navManager.navTo(Screen.StudentResultScreen.route)

@@ -2,9 +2,11 @@ package com.twendev.vulpes.lagopus.ui.repository
 
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Assignment
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AssignmentRepository : RepositoryInterface<Assignment> {
-    private val zerdaSource = ZerdaService.Singleton
+class AssignmentRepository : RepositoryInterface<Assignment>, KoinComponent {
+    private val zerdaSource : ZerdaService by inject()
 
     suspend fun get(workId: Int, groupId: Int) : Assignment? {
         return zerdaSource.api.getAssignments().firstOrNull { it.workId == workId && it.groupId == groupId}

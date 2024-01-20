@@ -63,6 +63,8 @@ android {
 }
 
 dependencies {
+    implementation("io.insert-koin:koin-android:3.5.3")
+
     implementation(project(":scaffold"))
 
     implementation("androidx.compose.material:material-icons-extended:1.5.4")

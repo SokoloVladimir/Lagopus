@@ -1,22 +1,24 @@
 package com.twendev.vulpes.lagopus.datasource
 
+import com.twendev.vulpes.lagopus.util.UtilLogger
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RetrofitClient {
-    private const val BASE_URL = "https://zerda.twenkey.ru"
-
+class RetrofitClient(
+    private val authOptions: AuthOptions,
+    private val utilLogger: UtilLogger
+) {
     private val okHttpClient = OkHttpClient()
         .newBuilder()
-        .addInterceptor(RequestInterceptor)
-        .addInterceptor(BearerInterceptor)
+        .addInterceptor(RequestInterceptor(utilLogger))
+        .addInterceptor(BearerInterceptor(authOptions))
         .build()
 
-    fun getClient(baseUrl: String? = null): Retrofit =
+    fun getClient(baseUrl: String): Retrofit =
         Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl(baseUrl ?: BASE_URL)
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 }

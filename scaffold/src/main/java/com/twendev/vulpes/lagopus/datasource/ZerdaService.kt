@@ -1,17 +1,13 @@
 package com.twendev.vulpes.lagopus.datasource
 
-import com.twendev.vulpes.lagopus.model.Bearer
+import com.twendev.vulpes.lagopus.util.UtilLogger
 
-class ZerdaService(baseUrl: String? = null) {
-    private val retrofit = RetrofitClient.getClient(baseUrl)
+class ZerdaService(authOptions: AuthOptions, utilLogger: UtilLogger) {
+    private val retrofit = RetrofitClient(authOptions, utilLogger).getClient(authOptions.instanceUrl)
     val api: ZerdaApi = retrofit.create(ZerdaApi::class.java)
 
-    var bearer : Bearer? = null
     fun get() {
         // TODO: написать обработчики на сырые методы api
-    }
-    companion object {
-        var Singleton : ZerdaService = ZerdaService()
     }
 }
 

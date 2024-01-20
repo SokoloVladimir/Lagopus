@@ -2,9 +2,11 @@ package com.twendev.vulpes.lagopus.ui.repository
 
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Work
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class WorkRepository : RepositoryInterface<Work> {
-    private val zerdaSource = ZerdaService.Singleton
+class WorkRepository : RepositoryInterface<Work>, KoinComponent {
+    private val zerdaSource : ZerdaService by inject()
 
     suspend fun get(id: Int) : Work? {
         return zerdaSource.api.getWorks().firstOrNull { it.id == id}

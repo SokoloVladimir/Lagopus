@@ -2,9 +2,11 @@ package com.twendev.vulpes.lagopus.ui.repository
 
 import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.model.Group
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class GroupRepository : RepositoryInterface<Group> {
-    private val zerdaSource = ZerdaService.Singleton
+class GroupRepository : RepositoryInterface<Group>, KoinComponent {
+    private val zerdaSource: ZerdaService by inject()
 
     suspend fun get(id: Int) : Group? {
         return zerdaSource.api.getGroups().firstOrNull { it.id == id}
