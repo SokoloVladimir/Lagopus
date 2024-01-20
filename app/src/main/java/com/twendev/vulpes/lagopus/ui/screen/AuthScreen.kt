@@ -30,6 +30,7 @@ import com.twendev.vulpes.lagopus.ui.component.circleloading.CircleLoading
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdown
 import com.twendev.vulpes.lagopus.ui.component.searchabledropdown.SearchableDropdownController
 import com.twendev.vulpes.lagopus.ui.component.textfield.PasswordTextField
+import com.twendev.vulpes.lagopus.ui.repository.PrefsRepository
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,16 +56,28 @@ fun AuthScreen(
     var login by remember { mutableStateOf("admin") }
     var passw by remember { mutableStateOf("admin") }
 
+    val instances : Set<String> = PrefsRepository().getStringSet("instances", setOf())!!
     val instanceController by remember { mutableStateOf(
         SearchableDropdownController(
-            list = listOf("https://zerda.twenkey.ru")
+            list = instances.toList(),
+            selected = instances.firstOrNull() ?: ""
         )
     )}
     val tryToConnect : () -> Unit = {
         scope.launch {
-            loadingStatus = resolveAuth(instanceController.uiState.value.selectedText, login, passw)
-            if (!loadingStatus) {
+            val instanceUrl = instanceController.uiState.value.selectedText
+            loadingStatus = resolveAuth(instanceUrl, login, passw)
+
+            if (loadingStatus) {
+                if (PrefsRepository().addToStringSet("instances", instanceUrl)) {
+                    Log.d("AuthScreen", "instance '$instanceUrl' was remembered")
+                }
+            } else {
                 showMessage("Ошибка подключения к API")
+
+                if (PrefsRepository().removeFromStringSet("instances", instanceUrl)) {
+                    Log.d("AuthScreen", "instance '$instanceUrl' was forgotten")
+                }
             }
         }
     }
