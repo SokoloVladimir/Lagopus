@@ -7,6 +7,7 @@ import com.twendev.vulpes.lagopus.datasource.ZerdaService
 import com.twendev.vulpes.lagopus.ui.repository.AssignmentRepository
 import com.twendev.vulpes.lagopus.ui.repository.AuthRepository
 import com.twendev.vulpes.lagopus.ui.repository.DisciplineRepository
+import com.twendev.vulpes.lagopus.ui.repository.PrefsRepository
 import com.twendev.vulpes.lagopus.ui.repository.ResultRepository
 import com.twendev.vulpes.lagopus.ui.repository.SemesterRepository
 import com.twendev.vulpes.lagopus.ui.repository.StudentRepository
@@ -25,6 +26,7 @@ fun startKoinWithAndroidContext(ctx: Context) {
         single { UtilLogger { tag, msg ->
             Log.d(tag, msg)
         }}
+        single { ctx.getSharedPreferences("settings", Context.MODE_PRIVATE) }
 
         factory { ZerdaService(get(), get()) }
 
@@ -36,6 +38,8 @@ fun startKoinWithAndroidContext(ctx: Context) {
         factory { StudentRepository() }
         factory { WorkRepository() }
         factory { WorkTypeRepository() }
+
+        factory { PrefsRepository() }
     }
 
     GlobalContext.startKoin {
